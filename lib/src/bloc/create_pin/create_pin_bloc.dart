@@ -12,7 +12,7 @@ part 'create_pin_state.dart';
 class CreatePINBloc extends Bloc<CreatePINEvent, CreatePINState> {
   final PINRepository pinRepository;
 
-  CreatePINBloc({required this.pinRepository}) : super(const CreatePINState(pinStatus: PINStatus.enterFirst)) {
+  CreatePINBloc({required this.pinRepository}) : super(CreatePINState(pinStatus: PINStatus.enterFirst)) {
     on<CreatePINAddEvent>((event, emit) {
       if (state.firstPIN.length < 4) {
         String firstPIN = "${state.firstPIN}${event.pinNum}";

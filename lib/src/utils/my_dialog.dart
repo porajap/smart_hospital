@@ -87,8 +87,10 @@ class MyDialog {
       builder: (BuildContext context) => AlertDialog(
         contentPadding: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
         content: Container(
+          padding: EdgeInsets.symmetric(horizontal: 10),
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
                 "$title",
