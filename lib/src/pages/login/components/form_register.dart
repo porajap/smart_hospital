@@ -11,6 +11,7 @@ import '../../../utils/constants.dart';
 import 'package:local_auth/error_codes.dart' as local_auth_error;
 
 import '../../../utils/my_widget.dart';
+import '../auth_pin_page.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({Key? key}) : super(key: key);
@@ -96,6 +97,15 @@ class _LoginFormState extends State<LoginForm> {
       return;
     }
 
+    if (!_result.isFirstTime && _result.isPhoneNumberIsCorrect) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => AuthPIN()),
+        ModalRoute.withName('/create-pin'),
+      );
+      return;
+    }
+
     if (!_result.isPhoneNumberIsCorrect) {
       MyDialog.dialogCustom(context: context, title: "ผิดพลาด", msg: "เบอร์มือถือไม่ถูกต้อง");
 
@@ -113,7 +123,7 @@ class _LoginFormState extends State<LoginForm> {
       );
     }
 
-    if (_phoneController.text == "0987654321") {
+    if (_phoneController.text == "0123456788") {
       return FirstTimeModel(
         isFirstTime: false,
         isPhoneNumberIsCorrect: true,

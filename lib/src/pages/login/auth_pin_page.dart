@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:smart_hospital/src/bloc/auth_pin/auth_pin_bloc.dart';
 import 'package:smart_hospital/src/pages/home/home_page.dart';
 import 'package:smart_hospital/src/utils/app_theme.dart';
 import 'package:smart_hospital/src/utils/my_dialog.dart';
@@ -9,18 +10,18 @@ import '../../data/pin_repository.dart';
 import 'components/button_of_numpad.dart';
 import 'components/pin_sphere.dart';
 
-class CreatePIN extends StatefulWidget {
-  const CreatePIN({Key? key}) : super(key: key);
+class AuthPIN extends StatefulWidget {
+  const AuthPIN({Key? key}) : super(key: key);
 
   @override
-  State<CreatePIN> createState() => _CreatePINState();
+  State<AuthPIN> createState() => _AuthPINState();
 }
 
-class _CreatePINState extends State<CreatePIN> {
+class _AuthPINState extends State<AuthPIN> {
   static const String setupPIN = "Setup PIN";
   static const String useSixDigitsPIN = "Use 6-digits PIN";
-  static const String pinCreated = "Your PIN code is successfully";
-  static const String pinNonCreated = "Pin codes do not match";
+  static const String authenticationSuccess = "Authentication success";
+  static const String authenticationFailed = "Authentication failed";
   static const String ok = "OK";
 
   @override
@@ -29,22 +30,22 @@ class _CreatePINState extends State<CreatePIN> {
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: BlocProvider(
         lazy: false,
-        create: (_) => CreatePINBloc(pinRepository: HivePINRepository()),
-        child: BlocListener<CreatePINBloc, CreatePINState>(
+        create: (_) => AuthenticationPinBloc(pinRepository: HivePINRepository()),
+        child: BlocListener<AuthenticationPinBloc, AuthenticationPinState>(
           listener: (context, state) {
-            if (state.pinStatus == PINStatus.equals) {
+            if (state.pinStatus == AuthenticationPINStatus.equals) {
               MyDialog.dialogCustom(
                 context: context,
                 callback: () {
                   goHomePage();
                 },
-                title: pinCreated,
+                title: authenticationSuccess,
                 msg: '',
                 cancelText: ok,
               );
-            } else if (state.pinStatus == PINStatus.unequals) {
+            } else if (state.pinStatus == AuthenticationPINStatus.unequals) {
               MyDialog.dialogCustom(
-                title: pinNonCreated,
+                title: authenticationFailed,
                 context: context,
                 cancelText: ok,
                 callback: () {
@@ -72,12 +73,12 @@ class _CreatePINState extends State<CreatePIN> {
     );
   }
 
-  Future<void> goHomePage() async{
+  Future<void> goHomePage() async {
     Navigator.pushAndRemoveUntil(context, HomePage.route(), (_) => false);
   }
 
   static Route route() {
-    return MaterialPageRoute<void>(builder: (_) => CreatePIN());
+    return MaterialPageRoute<void>(builder: (_) => AuthPIN());
   }
 }
 
@@ -100,7 +101,7 @@ class _NumPad extends StatelessWidget {
                   child: ButtonOfNumPad(
                     num: '1',
                     onPressed: () {
-                      context.read<CreatePINBloc>().add(CreatePINAddEvent(pinNum: 1));
+                      context.read<AuthenticationPinBloc>().add(AuthenticationPinAddEvent(pinNum: 1));
                     },
                   ),
                 ),
@@ -109,7 +110,7 @@ class _NumPad extends StatelessWidget {
                   child: ButtonOfNumPad(
                     num: '2',
                     onPressed: () {
-                      context.read<CreatePINBloc>().add(CreatePINAddEvent(pinNum: 2));
+                      context.read<AuthenticationPinBloc>().add(AuthenticationPinAddEvent(pinNum: 2));
                     },
                   ),
                 ),
@@ -118,7 +119,7 @@ class _NumPad extends StatelessWidget {
                   child: ButtonOfNumPad(
                     num: '3',
                     onPressed: () {
-                      context.read<CreatePINBloc>().add(CreatePINAddEvent(pinNum: 3));
+                      context.read<AuthenticationPinBloc>().add(AuthenticationPinAddEvent(pinNum: 3));
                     },
                   ),
                 ),
@@ -133,7 +134,7 @@ class _NumPad extends StatelessWidget {
                   child: ButtonOfNumPad(
                     num: '4',
                     onPressed: () {
-                      context.read<CreatePINBloc>().add(CreatePINAddEvent(pinNum: 4));
+                      context.read<AuthenticationPinBloc>().add(AuthenticationPinAddEvent(pinNum: 4));
                     },
                   ),
                 ),
@@ -142,7 +143,7 @@ class _NumPad extends StatelessWidget {
                   child: ButtonOfNumPad(
                     num: '5',
                     onPressed: () {
-                      context.read<CreatePINBloc>().add(CreatePINAddEvent(pinNum: 5));
+                      context.read<AuthenticationPinBloc>().add(AuthenticationPinAddEvent(pinNum: 5));
                     },
                   ),
                 ),
@@ -151,7 +152,7 @@ class _NumPad extends StatelessWidget {
                   child: ButtonOfNumPad(
                     num: '6',
                     onPressed: () {
-                      context.read<CreatePINBloc>().add(CreatePINAddEvent(pinNum: 6));
+                      context.read<AuthenticationPinBloc>().add(AuthenticationPinAddEvent(pinNum: 6));
                     },
                   ),
                 ),
@@ -166,7 +167,7 @@ class _NumPad extends StatelessWidget {
                   child: ButtonOfNumPad(
                     num: '7',
                     onPressed: () {
-                      context.read<CreatePINBloc>().add(CreatePINAddEvent(pinNum: 7));
+                      context.read<AuthenticationPinBloc>().add(AuthenticationPinAddEvent(pinNum: 7));
                     },
                   ),
                 ),
@@ -175,7 +176,7 @@ class _NumPad extends StatelessWidget {
                   child: ButtonOfNumPad(
                     num: '8',
                     onPressed: () {
-                      context.read<CreatePINBloc>().add(CreatePINAddEvent(pinNum: 8));
+                      context.read<AuthenticationPinBloc>().add(AuthenticationPinAddEvent(pinNum: 8));
                     },
                   ),
                 ),
@@ -184,7 +185,7 @@ class _NumPad extends StatelessWidget {
                   child: ButtonOfNumPad(
                     num: '9',
                     onPressed: () {
-                      context.read<CreatePINBloc>().add(CreatePINAddEvent(pinNum: 9));
+                      context.read<AuthenticationPinBloc>().add(AuthenticationPinAddEvent(pinNum: 9));
                     },
                   ),
                 ),
@@ -203,7 +204,7 @@ class _NumPad extends StatelessWidget {
                   child: ButtonOfNumPad(
                     num: '0',
                     onPressed: () {
-                      context.read<CreatePINBloc>().add(CreatePINAddEvent(pinNum: 10));
+                      context.read<AuthenticationPinBloc>().add(AuthenticationPinAddEvent(pinNum: 10));
                     },
                   ),
                 ),
@@ -215,7 +216,7 @@ class _NumPad extends StatelessWidget {
                       color: Colors.black,
                     ),
                     onPressed: () {
-                      context.read<CreatePINBloc>().add(CreatePINEraseEvent());
+                      context.read<AuthenticationPinBloc>().add(AuthenticationPinEraseEvent());
                     },
                   ),
                 ),
@@ -226,18 +227,16 @@ class _NumPad extends StatelessWidget {
       ),
     );
   }
-
 }
 
 class _MainPart extends StatelessWidget {
-  static const String createPIN = "Create PIN";
-  static const String reEnterYourPIN = "Re-enter your PIN";
+  static const String enterYourPIN = "Enter your PIN";
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CreatePINBloc, CreatePINState>(
+    return BlocBuilder<AuthenticationPinBloc, AuthenticationPinState>(
       buildWhen: (previous, current) {
-        return previous.firstPIN != current.firstPIN || previous.secondPIN != current.secondPIN;
+        return previous.pin != current.pin;
       },
       builder: (context, state) {
         return Container(
@@ -246,7 +245,7 @@ class _MainPart extends StatelessWidget {
             Flexible(
               flex: 2,
               child: Text(
-                state.pinStatus == PINStatus.enterFirst ? createPIN : reEnterYourPIN,
+                enterYourPIN,
                 style: TextStyle(color: AppColor.textPrimaryColor, fontSize: 36),
               ),
             ),
@@ -263,4 +262,3 @@ class _MainPart extends StatelessWidget {
     );
   }
 }
-

@@ -8,6 +8,8 @@ class QueueDetail {
   String? prefix;
   String? fName;
   String? lName;
+  String? HN;
+  String? refNumber;
 
   QueueDetail({
     this.date,
@@ -17,5 +19,7 @@ class QueueDetail {
     this.lName,
     this.queue,
     this.roomName,
+    this.HN,
+    this.refNumber,
   });
 }
