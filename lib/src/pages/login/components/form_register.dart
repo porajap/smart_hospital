@@ -120,6 +120,7 @@ class _LoginFormState extends State<LoginForm> {
       return FirstTimeModel(
         isFirstTime: true,
         isPhoneNumberIsCorrect: true,
+        isBoss: false,
       );
     }
 
@@ -127,12 +128,14 @@ class _LoginFormState extends State<LoginForm> {
       return FirstTimeModel(
         isFirstTime: false,
         isPhoneNumberIsCorrect: true,
+        isBoss: true,
       );
     }
 
     return FirstTimeModel(
       isFirstTime: false,
       isPhoneNumberIsCorrect: false,
+      isBoss: true,
     );
   }
 

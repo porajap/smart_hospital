@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smart_hospital/src/bloc/auth_pin/auth_pin_bloc.dart';
+import 'package:smart_hospital/src/pages/dashboard/dashboard.dart';
 import 'package:smart_hospital/src/pages/home/home_page.dart';
 import 'package:smart_hospital/src/utils/app_theme.dart';
 import 'package:smart_hospital/src/utils/my_dialog.dart';
@@ -37,7 +38,7 @@ class _AuthPINState extends State<AuthPIN> {
               MyDialog.dialogCustom(
                 context: context,
                 callback: () {
-                  goHomePage();
+                  goHomePage(state.pin);
                 },
                 title: authenticationSuccess,
                 msg: '',
@@ -73,8 +74,14 @@ class _AuthPINState extends State<AuthPIN> {
     );
   }
 
-  Future<void> goHomePage() async {
+  Future<void> goHomePage(String pin) async {
+
+    if(pin == "1111"){
+      Navigator.pushAndRemoveUntil(context, Dashboard.route(), (_) => false);
+      return;
+    }
     Navigator.pushAndRemoveUntil(context, HomePage.route(), (_) => false);
+
   }
 
   static Route route() {

@@ -20,7 +20,9 @@ class AuthenticationPinBloc extends Bloc<AuthenticationPinEvent, AuthenticationP
         emit(AuthenticationPinState(pin: pin, pinStatus: AuthenticationPINStatus.enterPIN));
       } else if (pin == "1111") {
         emit(AuthenticationPinState(pin: pin, pinStatus: AuthenticationPINStatus.equals));
-      } else {
+      }else if (pin == "2222") {
+        emit(AuthenticationPinState(pin: pin, pinStatus: AuthenticationPINStatus.equals));
+      }else {
         emit(AuthenticationPinState(pin: pin, pinStatus: AuthenticationPINStatus.unequals));
         await Future.delayed(
           Duration(seconds: 1),
