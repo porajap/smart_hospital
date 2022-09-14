@@ -29,6 +29,8 @@ dependencies:
   hive_flutter: ^1.1.0
   geolocator: ^9.0.1
   fl_chart: ^0.55.1
+  syncfusion_flutter_charts: ^20.2.49
+  syncfusion_flutter_gauges: ^20.2.49
 
 dev_dependencies:
   flutter_test:
