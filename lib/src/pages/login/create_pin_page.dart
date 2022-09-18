@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:smart_hospital/src/pages/dashboard/dashboard.dart';
 import 'package:smart_hospital/src/pages/home/home_page.dart';
 import 'package:smart_hospital/src/utils/app_theme.dart';
 import 'package:smart_hospital/src/utils/my_dialog.dart';
 
+import '../../../main.dart';
 import '../../bloc/create_pin/create_pin_bloc.dart';
 import '../../data/pin_repository.dart';
 import 'components/button_of_numpad.dart';
@@ -17,8 +19,6 @@ class CreatePIN extends StatefulWidget {
 }
 
 class _CreatePINState extends State<CreatePIN> {
-  static const String setupPIN = "Setup PIN";
-  static const String useSixDigitsPIN = "Use 6-digits PIN";
   static const String pinCreated = "Your PIN code is successfully";
   static const String pinNonCreated = "Pin codes do not match";
   static const String ok = "OK";
@@ -27,43 +27,56 @@ class _CreatePINState extends State<CreatePIN> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-      child: BlocProvider(
-        lazy: false,
-        create: (_) => CreatePINBloc(pinRepository: HivePINRepository()),
-        child: BlocListener<CreatePINBloc, CreatePINState>(
-          listener: (context, state) {
-            if (state.pinStatus == PINStatus.equals) {
-              MyDialog.dialogCustom(
-                context: context,
-                callback: () {
-                  goHomePage();
-                },
-                title: pinCreated,
-                msg: '',
-                cancelText: ok,
-              );
-            } else if (state.pinStatus == PINStatus.unequals) {
-              MyDialog.dialogCustom(
-                title: pinNonCreated,
-                context: context,
-                cancelText: ok,
-                callback: () {
-                  context.read<CreatePINBloc>().add(CreateNullPINEvent());
-                },
-                msg: '',
-              );
-            }
-          },
-          child: Scaffold(
-            body: SafeArea(
-              child: Container(
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Expanded(flex: 2, child: _MainPart()),
-                    Expanded(flex: 3, child: _NumPad()),
-                  ],
-                ),
+      child: BlocListener<CreatePINBloc, CreatePINState>(
+        listener: (context, state) {
+          if (state.pinStatus == PINStatus.equals) {
+
+            MyDialog.dialogCustom(
+              context: context,
+              callback: () {
+                if (state.loggedInData?.data?.role == 1) {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (_) => Dashboard(),
+                    ),
+                    (_) => false,
+                  );
+                }else{
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (_) => HomePage(),
+                    ),
+                        (_) => false,
+                  );
+                }
+              },
+              title: pinCreated,
+              msg: '',
+              cancelText: ok,
+            );
+          } else if (state.pinStatus == PINStatus.unequals) {
+            MyDialog.dialogCustom(
+              title: pinNonCreated,
+              context: context,
+              cancelText: ok,
+              callback: () {
+                context.read<CreatePINBloc>().add(CreateNullPINEvent());
+              },
+              msg: '',
+            );
+          }
+        },
+        child: Scaffold(
+          body: SafeArea(
+            child: Container(
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Expanded(flex: 2, child: _MainPart()),
+                  Expanded(flex: 3, child: _NumPad()),
+                ],
               ),
             ),
           ),
@@ -72,13 +85,6 @@ class _CreatePINState extends State<CreatePIN> {
     );
   }
 
-  Future<void> goHomePage() async{
-    Navigator.pushAndRemoveUntil(context, HomePage.route(), (_) => false);
-  }
-
-  static Route route() {
-    return MaterialPageRoute<void>(builder: (_) => CreatePIN());
-  }
 }
 
 class _NumPad extends StatelessWidget {
@@ -226,7 +232,6 @@ class _NumPad extends StatelessWidget {
       ),
     );
   }
-
 }
 
 class _MainPart extends StatelessWidget {
@@ -263,4 +268,3 @@ class _MainPart extends StatelessWidget {
     );
   }
 }
-

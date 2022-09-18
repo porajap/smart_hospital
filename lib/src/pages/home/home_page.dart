@@ -1,8 +1,11 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:smart_hospital/src/bloc/auth/auth_bloc.dart';
 import 'package:smart_hospital/src/model/home/queue_detail_model.dart';
 import 'package:smart_hospital/src/pages/login/login_page.dart';
+import 'package:smart_hospital/src/services/preferences_service.dart';
 import 'package:smart_hospital/src/utils/app_theme.dart';
 import 'package:smart_hospital/src/utils/date_time_format.dart';
 import 'package:smart_hospital/src/utils/my_dialog.dart';
@@ -17,9 +20,6 @@ class HomePage extends StatefulWidget {
   @override
   State<HomePage> createState() => _HomePageState();
 
-  static Route route() {
-    return MaterialPageRoute<void>(builder: (_) => HomePage());
-  }
 }
 
 class _HomePageState extends State<HomePage> {
@@ -35,6 +35,19 @@ class _HomePageState extends State<HomePage> {
 
   bool isConfirm = false;
 
+  Future<void> getUserLoggedIn() async{
+    final _prefService = SharedPreferencesService();
+
+    String _token = await _prefService.getToken();
+
+  }
+
+  @override
+  void initState() {
+    getUserLoggedIn();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,11 +59,7 @@ class _HomePageState extends State<HomePage> {
             MyDialog.dialogConfirm(
               context: context,
               callback: () {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginPage()),
-                  ModalRoute.withName('/login'),
-                );
+                context.read<AuthBloc>().add(AuthEventLoggedOut());
               },
               title: "ออกจากระบบ",
               msg: 'คุณต้องการออกจากระบบใช่หรือไม่?',
@@ -391,7 +400,6 @@ class _HomePageState extends State<HomePage> {
     );
     BotToast.closeAllLoading();
 
-    logger.i(destination / 1000);
 
     if (destination > 20) {
       MyDialog.dialogCustom(

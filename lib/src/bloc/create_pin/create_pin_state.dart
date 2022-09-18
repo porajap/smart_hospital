@@ -1,20 +1,25 @@
 part of 'create_pin_bloc.dart';
 
-enum PINStatus { enterFirst, enterSecond, equals , unequals}
+enum PINStatus { enterFirst, enterSecond, equals, unequals }
 
 @immutable
 class CreatePINState {
   final PINStatus pinStatus;
   final String firstPIN;
   final String secondPIN;
+  LoggedModel? loggedInData = LoggedModel(data: Data());
 
-  const CreatePINState({this.firstPIN = "", this.secondPIN = "", required this.pinStatus});
+  CreatePINState({
+    this.firstPIN = "",
+    this.secondPIN = "",
+    required this.pinStatus,
+    this.loggedInData,
+  });
 
-  int getCountsOfPIN(){
-    if(firstPIN.length < 4){
+  int getCountsOfPIN() {
+    if (firstPIN.length < 4) {
       return firstPIN.length;
-    }
-    else {
+    } else {
       return secondPIN.length;
     }
   }
@@ -28,7 +33,7 @@ class CreatePINState {
       pinStatus: pinStatus ?? this.pinStatus,
       firstPIN: firstPIN ?? this.firstPIN,
       secondPIN: secondPIN ?? this.secondPIN,
+      loggedInData: loggedInData,
     );
   }
-
 }

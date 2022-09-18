@@ -23,6 +23,7 @@ class Constants{
   static String loginPhoneLabel = 'เบอร์มือถือ';
   static String loginPhoneEmpty = 'กรุณากรอกเบอร์ติดต่อ';
   static String loginRegister = 'ลงทะเบียน';
+  static String loginSignIn = 'เข้าสู่ระบบ';
 
 
 }

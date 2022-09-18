@@ -1,19 +1,19 @@
 part of 'auth_pin_bloc.dart';
 
 
-enum AuthenticationPINStatus { enterPIN, equals , unequals}
+enum AuthPINStatus { enterPIN, checkPin, loading }
 @immutable
-class AuthenticationPinState {
-  final AuthenticationPINStatus pinStatus;
+class AuthPinState {
+  final AuthPINStatus pinStatus;
   final String pin;
 
-  const AuthenticationPinState({required this.pinStatus, this.pin = ""});
+  const AuthPinState({required this.pinStatus, this.pin = ""});
 
-  AuthenticationPinState copyWith({
-    AuthenticationPINStatus? pinStatus,
+  AuthPinState copyWith({
+    AuthPINStatus? pinStatus,
     String? pin,
   }) {
-    return AuthenticationPinState(
+    return AuthPinState(
       pinStatus: pinStatus ?? this.pinStatus,
       pin: pin ?? this.pin,
     );
