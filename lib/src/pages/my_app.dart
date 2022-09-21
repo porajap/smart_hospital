@@ -7,6 +7,7 @@ import 'package:smart_hospital/src/bloc/auth_pin/auth_pin_bloc.dart';
 import 'package:smart_hospital/src/pages/dashboard/dashboard.dart';
 
 import '../bloc/auth/auth_bloc.dart';
+import '../services/navigation_service.dart';
 import '../utils/app_theme.dart';
 import '../utils/constants.dart';
 import '../utils/my_dialog.dart';
@@ -40,6 +41,7 @@ class _MyAppState extends State<MyApp> {
     }
 
     return MaterialApp(
+      navigatorKey: NavigationService.navigatorKey,
       title: '${Constants.appName}',
       theme: AppTheme.primaryTheme,
       builder: BotToastInit(),

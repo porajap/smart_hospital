@@ -15,18 +15,17 @@ import 'package:smart_hospital/src/utils/my_widget.dart';
 
 import '../../../main.dart';
 import '../../utils/app_bar.dart';
+import '../my_app.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
-
 }
 
 class _HomePageState extends State<HomePage> {
   final queueService = QueueService();
-
 
   QueueModel queueData = QueueModel(data: Data());
 
@@ -75,7 +74,7 @@ class _HomePageState extends State<HomePage> {
             child: queueData.data == null
                 ? Center(
                     child: Text(
-                      "สแกนคิวอาร์โค้ดเพื่อดูรายละเอียด",
+                      "สแกนคิวอาร์โค้ดเพื่อจองคิว",
                       style: Theme.of(context).textTheme.headline1,
                     ),
                   )
@@ -116,218 +115,339 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildDetail() => SingleChildScrollView(
-        child: Container(
-          padding: EdgeInsets.only(bottom: 40),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+  Widget buildUserData() {
+    var _userData = queueData.data?.userDetail;
+    var _queueData = queueData.data;
+
+    String _hnCode = _userData?.hnCode ?? "";
+    String _fName = _userData?.fNameTh ?? "";
+    String _lName = _userData?.lNameTh ?? "";
+    String _fullName = '$_fName $_lName';
+
+    String _date = _queueData?.dateAt ?? "";
+    String _time = _queueData?.timeAt ?? "";
+
+    String _userType = "ทั่วไป";
+
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+      width: MediaQuery.of(context).size.width,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Card(
-                child: !isConfirm ? buildQueueDetail() : buildDetailWhenConfirm(),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("หมายเลข HN", style: TextStyle(fontSize: 12)),
+                  Text("$_hnCode",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColor.textPrimaryColor,
+                        fontWeight: FontWeight.bold,
+                      )),
+                ],
               ),
-              SizedBox(height: 15),
-              !isConfirm
-                  ? Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: _getCurrentPosition,
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(vertical: 10),
-                              child: Text("ยืนยันลำดับ (failed)"),
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 10),
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: confirmOnSuccess,
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(vertical: 10),
-                              child: Text("ยืนยันลำดับ (success)"),
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-                  : Container(
-                      width: MediaQuery.of(context).size.width,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.deepOrange),
-                        onPressed: nextRoom,
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 10),
-                          child: Text("ห้องถัดไป"),
-                        ),
-                      ),
-                    ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text("วันที่/เวลา ที่มาถึง รพ.", style: TextStyle(fontSize: 12)),
+                  Text("$_date $_time",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColor.textPrimaryColor,
+                        fontWeight: FontWeight.bold,
+                      )),
+                ],
+              ),
             ],
           ),
-        ),
-      );
+          SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("ชื่อ - นามสกุล", style: TextStyle(fontSize: 12)),
+                  Text("$_fullName",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColor.textPrimaryColor,
+                        fontWeight: FontWeight.bold,
+                      )),
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text("ประเภทผู้ป่วย", style: TextStyle(fontSize: 12)),
+                  Text("$_userType",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColor.textPrimaryColor,
+                        fontWeight: FontWeight.bold,
+                      )),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 
-  Widget buildQueueDetail() => Container(
+  Widget buildDetail() {
+
+    var _isConfirm = queueData.data?.isConfirm;
+
+    return SingleChildScrollView(
+      child: Container(
+        padding: EdgeInsets.only(bottom: 40),
+        child: Column(
+          children: [
+            Card(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  buildUserData(),
+                  Divider(),
+                  buildQueueDetail(),
+                ],
+              ),
+            ),
+            SizedBox(height: 5),
+            Visibility(
+              visible: _isConfirm == 0,
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                child: ElevatedButton(
+                  onPressed: confirmQueue,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10),
+                    child: Text("ยันยันรับคิว"),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildQueueDetail() {
+
+    var _queueData = queueData.data;
+    var _queueDetail= queueData.data?.queueDetail;
+
+    String _queueNo = _queueData?.queueNo ?? "";
+    String _roomName = _queueData?.roomName ?? "";
+
+    String _queueOfRoom = _queueDetail?.queueOfRoom != null ? '${_queueDetail?.queueOfRoom as int}' : '-';
+    String _queueOfFront = _queueDetail?.queueOfFront != null ? '${_queueDetail?.queueOfFront as int}' : '-';
+
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+      child: Column(
+        children: [
+          Column(
+            children: [
+              Column(
+                children: [
+                  Text(
+                    "หมายเลขคิวของคุุณ",
+                    style: Theme.of(context).textTheme.headline1,
+                  ),
+                  Text(
+                    "(${_roomName})",
+                    style: TextStyle(
+                      color: AppColor.textPrimaryColor,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 5),
+              Text(
+                "${_queueNo}",
+                style: TextStyle(
+                  color: AppColor.primaryColor,
+                  fontSize: 36,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10),
+          Divider(),
+          SizedBox(height: 10),
+          IntrinsicHeight(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      "คิวของห้อง",
+                      style: Theme.of(context).textTheme.subtitle2,
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      "$_queueOfRoom",
+                      style: TextStyle(
+                        color: AppColor.primaryColor.withOpacity(0.5),
+                        fontSize: 30,
+                      ),
+                    ),
+                  ],
+                ),
+                VerticalDivider(
+                  thickness: 1,
+                  color: AppColor.grayColor,
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      "คิวก่อนหน้า",
+                      style: Theme.of(context).textTheme.subtitle2,
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      "$_queueOfFront",
+                      style: TextStyle(
+                        color: AppColor.primaryColor.withOpacity(0.5),
+                        fontSize: 30,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 15),
+        ],
+      ),
+    );
+  }
+
+  Widget buildDetailWhenConfirm() => Container(
         width: MediaQuery.of(context).size.width,
         padding: EdgeInsets.symmetric(vertical: 15),
         child: Column(
           children: [
-            Column(
-              children: [
-                Text(
-                  "ลำดับของคุุณคือ",
-                  style: Theme.of(context).textTheme.headline1,
-                ),
-                SizedBox(height: 5),
-                Text(
-                  "${queueData.data?.queueNo??""}",
-                  style: TextStyle(
-                    color: AppColor.primaryColor,
-                    fontSize: 36,
-                  ),
-                ),
-              ],
+            Text(
+              "${queueData.data?.roomName ?? ""}",
+              style: TextStyle(
+                color: AppColor.primaryColor,
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+              ),
             ),
+            buildQueueDetail(),
+            Divider(height: 1),
             SizedBox(height: 15),
             Column(
               children: [
                 Text(
-                  "ลำดับก่อนหน้า",
+                  "ชื่อผู้ป่วย",
                   style: Theme.of(context).textTheme.subtitle2,
                 ),
                 SizedBox(height: 5),
                 Text(
-                  "-- - -",
+                  "-- --",
                   style: TextStyle(
-                    color: AppColor.primaryColor.withOpacity(0.5),
-                    fontSize: 30,
+                    color: AppColor.textPrimaryColor,
+                    fontSize: 18,
                   ),
                 ),
               ],
             ),
             SizedBox(height: 15),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "${queueData.data?.dateAt ?? ""}",
+            Column(
+              children: [
+                Text(
+                  "HN สิทธิ์",
+                  style: Theme.of(context).textTheme.subtitle2,
+                ),
+                SizedBox(height: 5),
+                Text(
+                  "-- -",
+                  style: TextStyle(
+                    color: AppColor.textPrimaryColor,
+                    fontSize: 18,
                   ),
-                  Text(
-                    "${queueData.data?.timeAt?? ""} น.",
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
+            SizedBox(height: 15),
+            Divider(),
+            SizedBox(height: 15),
+            Column(
+              children: [
+                Text(
+                  "ไม่มีนัด",
+                  style: Theme.of(context).textTheme.subtitle2,
+                ),
+                SizedBox(height: 5),
+                Text(
+                  "ต้องการพบแพทย์",
+                  style: TextStyle(
+                    color: AppColor.textPrimaryColor,
+                    fontSize: 20,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 30),
+            Text("(กรุณาแสดงหน้าจอให้เจ้าหน้าที่)")
           ],
         ),
       );
-
-  Widget buildDetailWhenConfirm() => Container(
-    width: MediaQuery.of(context).size.width,
-    padding: EdgeInsets.symmetric(vertical: 15),
-    child: Column(
-      children: [
-        Text(
-          "${queueData.data?.roomName ?? ""}",
-          style: TextStyle(
-            color: AppColor.primaryColor,
-            fontSize: 30,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        buildQueueDetail(),
-        Divider(height: 1),
-        SizedBox(height: 15),
-        Column(
-          children: [
-            Text(
-              "ชื่อผู้ป่วย",
-              style: Theme.of(context).textTheme.subtitle2,
-            ),
-            SizedBox(height: 5),
-            Text(
-              "-- --",
-              style: TextStyle(
-                color: AppColor.textPrimaryColor,
-                fontSize: 18,
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 15),
-        Column(
-          children: [
-            Text(
-              "HN สิทธิ์",
-              style: Theme.of(context).textTheme.subtitle2,
-            ),
-            SizedBox(height: 5),
-            Text(
-              "-- -",
-              style: TextStyle(
-                color: AppColor.textPrimaryColor,
-                fontSize: 18,
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 15),
-        Divider(),
-        SizedBox(height: 15),
-        Column(
-          children: [
-            Text(
-              "ไม่มีนัด",
-              style: Theme.of(context).textTheme.subtitle2,
-            ),
-            SizedBox(height: 5),
-            Text(
-              "ต้องการพบแพทย์",
-              style: TextStyle(
-                color: AppColor.textPrimaryColor,
-                fontSize: 20,
-                decoration: TextDecoration.underline,
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 30),
-        Text("(กรุณาแสดงหน้าจอให้เจ้าหน้าที่)")
-      ],
-    ),
-  );
 
   Future<void> queueToday() async {
     BotToast.showLoading();
 
     queueData = await queueService.queueOfUserToday();
 
-
-    BotToast.closeAllLoading();
-
     setState(() {
+      BotToast.closeAllLoading();
     });
   }
 
   Future<void> scanQrCode() async {
-
     BotToast.showLoading();
 
     queueData = await queueService.scanQr();
 
-    BotToast.closeAllLoading();
+    bool _error = queueData.error ?? false;
+
+    if(_error){
+      queueToday();
+      return;
+    }
 
     setState(() {
+      BotToast.closeAllLoading();
     });
   }
 
-  Future<void> confirmOnSuccess() async {
+  Future<void> confirmQueue() async {
     BotToast.showLoading();
-    await Future.delayed(Duration(seconds: 1));
-    BotToast.closeAllLoading();
+
+    int _queueId = queueData.data?.id as int;
+    int _roomId = queueData.data?.roomId as int;
+    String _queueNo = queueData.data?.queueNo ?? "";
+
+    queueData = await queueService.confirmQueue(queueId: _queueId, queueNo: _queueNo, roomId: _roomId);
+
     setState(() {
-      isConfirm = true;
+      BotToast.closeAllLoading();
     });
   }
 
@@ -364,7 +484,6 @@ class _HomePageState extends State<HomePage> {
       roomLongitude,
     );
     BotToast.closeAllLoading();
-
 
     if (destination > 20) {
       MyDialog.dialogCustom(

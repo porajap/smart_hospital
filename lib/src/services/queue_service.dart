@@ -35,8 +35,6 @@ class QueueService {
 
       _data = QueueModel.fromJson(_jsonResponse);
 
-      logger.w(_data.toJson());
-
       return _data;
     } catch (err) {
       logger.e(err);
@@ -71,6 +69,52 @@ class QueueService {
       return _data;
     } catch (err) {
       logger.e(err);
+      return _data;
+    }
+  }
+
+  Future<QueueModel> confirmQueue({
+    required int queueId,
+    required String queueNo,
+    required int roomId,
+  }) async {
+    QueueModel _data = QueueModel();
+
+    try {
+      final _token = await prefService.getToken();
+
+      final _header = {
+        HttpHeaders.authorizationHeader: '$_token',
+      };
+
+      Map<String, dynamic> _body = {
+        "id": '$queueId',
+        "queueNo": '$queueNo',
+        "roomId": '$roomId',
+      };
+
+      final _url = Uri.parse('${AppUrl.confirmQueue}');
+
+      final _response = await http.post(
+        _url,
+        headers: _header,
+        body: _body,
+      );
+      logger.w(_response.statusCode );
+
+      if (_response.statusCode == 401) {
+        throw AuthenticationUnauthorized();
+      }
+
+      final _jsonResponse = json.decode(_response.body);
+
+      _data = QueueModel.fromJson(_jsonResponse);
+
+      logger.w(_data.toJson());
+
+      return _data;
+    } catch (err) {
+      logger.e(err.toString());
       return _data;
     }
   }

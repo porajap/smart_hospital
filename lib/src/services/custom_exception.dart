@@ -1,4 +1,5 @@
 import '../bloc/auth/auth_bloc.dart';
+import '../pages/my_app.dart';
 import 'navigation_service.dart';
 import 'package:provider/provider.dart';
 
