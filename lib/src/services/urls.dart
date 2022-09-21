@@ -1,10 +1,13 @@
 class AppUrl{
-  static final String devUrl = "http://192.168.1.112:3001/api";
+  static final String devUrl = "https://smart-hospital-api.herokuapp.com/api";
   static final String productionUrl = "";
 
   static final String baseUrl = devUrl;
 
-  static final String checkPhoneUrl = "$baseUrl/check-phone";
-  static final String cretePinUrl = "$baseUrl/create-pin";
-  static final String loginUrl = "$baseUrl/login";
+  static final String checkPhone = "$baseUrl/check-phone";
+  static final String cretePin = "$baseUrl/create-pin";
+  static final String login = "$baseUrl/login";
+
+  static final String scanQr = "$baseUrl/scan-qr";
+  static final String queueToday = "$baseUrl/queue-of-user";
 }

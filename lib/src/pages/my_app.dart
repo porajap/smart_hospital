@@ -52,6 +52,26 @@ class _MyAppState extends State<MyApp> {
           if (state is AuthStateLoading) {
             BotToast.showLoading();
           }
+
+          if (state is AuthStateCheckLogin) {
+            var _checkLoginData = state.checkLoginData;
+            bool _firstLogin = _checkLoginData.data?.firstLogin ?? false;
+            bool _error = _checkLoginData.error ?? false;
+            context.read<AuthPinBloc>().add(AuthNullPINEvent());
+
+            if (_error) {
+              WidgetsBinding.instance.addPostFrameCallback((_) => MyDialog.dialogCustom(
+                context: context,
+                title: "Message",
+                msg: "ไม่พบข้อมูลของคุณ กรุณาติดต่อเจ้าหน้าที่",
+              ));
+
+            }
+          }
+
+          if (state is AuthStatePINUnEqual) {
+            BotToast.showText(text: "PIN ไม่ถูกต้อง");
+          }
         },
         child: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, state) {
@@ -73,12 +93,6 @@ class _MyAppState extends State<MyApp> {
               context.read<AuthPinBloc>().add(AuthNullPINEvent());
 
               if (_error) {
-                WidgetsBinding.instance.addPostFrameCallback((_) => MyDialog.dialogCustom(
-                      context: context,
-                      title: "Message",
-                      msg: "ไม่พบข้อมูลของคุณ กรุณาติดต่อเจ้าหน้าที่",
-                    ));
-
                 return LoginPage();
               } else if (_firstLogin) {
                 return CreatePIN();

@@ -4,8 +4,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:smart_hospital/src/bloc/auth/auth_bloc.dart';
 import 'package:smart_hospital/src/model/home/queue_detail_model.dart';
+import 'package:smart_hospital/src/model/home/queue_model.dart';
 import 'package:smart_hospital/src/pages/login/login_page.dart';
 import 'package:smart_hospital/src/services/preferences_service.dart';
+import 'package:smart_hospital/src/services/queue_service.dart';
 import 'package:smart_hospital/src/utils/app_theme.dart';
 import 'package:smart_hospital/src/utils/date_time_format.dart';
 import 'package:smart_hospital/src/utils/my_dialog.dart';
@@ -23,7 +25,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  QueueDetail? _queueDetail;
+  final queueService = QueueService();
+
+
+  QueueModel queueData = QueueModel(data: Data());
 
   bool isLoading = false;
 
@@ -35,16 +40,9 @@ class _HomePageState extends State<HomePage> {
 
   bool isConfirm = false;
 
-  Future<void> getUserLoggedIn() async{
-    final _prefService = SharedPreferencesService();
-
-    String _token = await _prefService.getToken();
-
-  }
-
   @override
   void initState() {
-    getUserLoggedIn();
+    queueToday();
     super.initState();
   }
 
@@ -74,7 +72,7 @@ class _HomePageState extends State<HomePage> {
         child: MyScreen(
           child: Container(
             height: MediaQuery.of(context).size.height,
-            child: _queueDetail == null
+            child: queueData.data == null
                 ? Center(
                     child: Text(
                       "สแกนคิวอาร์โค้ดเพื่อดูรายละเอียด",
@@ -181,7 +179,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 SizedBox(height: 5),
                 Text(
-                  "${_queueDetail!.queue}",
+                  "${queueData.data?.queueNo??""}",
                   style: TextStyle(
                     color: AppColor.primaryColor,
                     fontSize: 36,
@@ -198,7 +196,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 SizedBox(height: 5),
                 Text(
-                  "${_queueDetail!.queue! - 2}",
+                  "-- - -",
                   style: TextStyle(
                     color: AppColor.primaryColor.withOpacity(0.5),
                     fontSize: 30,
@@ -213,10 +211,10 @@ class _HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "${_queueDetail!.date}",
+                    "${queueData.data?.dateAt ?? ""}",
                   ),
                   Text(
-                    "${_queueDetail!.time} น.",
+                    "${queueData.data?.timeAt?? ""} น.",
                   ),
                 ],
               ),
@@ -231,7 +229,7 @@ class _HomePageState extends State<HomePage> {
     child: Column(
       children: [
         Text(
-          "${_queueDetail!.roomName}",
+          "${queueData.data?.roomName ?? ""}",
           style: TextStyle(
             color: AppColor.primaryColor,
             fontSize: 30,
@@ -249,7 +247,7 @@ class _HomePageState extends State<HomePage> {
             ),
             SizedBox(height: 5),
             Text(
-              "${_queueDetail!.prefix} ${_queueDetail!.fName} ${_queueDetail!.lName}",
+              "-- --",
               style: TextStyle(
                 color: AppColor.textPrimaryColor,
                 fontSize: 18,
@@ -266,7 +264,7 @@ class _HomePageState extends State<HomePage> {
             ),
             SizedBox(height: 5),
             Text(
-              "${_queueDetail!.HN}",
+              "-- -",
               style: TextStyle(
                 color: AppColor.textPrimaryColor,
                 fontSize: 18,
@@ -277,25 +275,7 @@ class _HomePageState extends State<HomePage> {
         SizedBox(height: 15),
         Divider(),
         SizedBox(height: 15),
-        _queueDetail!.refNumber != "" && _queueDetail!.refNumber != null
-            ? Column(
-                children: [
-                  Text(
-                    "หมายเลขอ้างอิง",
-                    style: Theme.of(context).textTheme.subtitle2,
-                  ),
-                  SizedBox(height: 5),
-                  Text(
-                    "${_queueDetail!.refNumber}",
-                    style: TextStyle(
-                      color: AppColor.textPrimaryColor,
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold
-                    ),
-                  ),
-                ],
-              )
-            : Column(
+        Column(
           children: [
             Text(
               "ไม่มีนัด",
@@ -318,44 +298,33 @@ class _HomePageState extends State<HomePage> {
     ),
   );
 
-  Future<void> scanQrCode() async {
+  Future<void> queueToday() async {
     BotToast.showLoading();
 
-    await Future.delayed(Duration(seconds: 1));
+    queueData = await queueService.queueOfUserToday();
 
-    final _date = DateTime.now();
-    final _time = TimeOfDay.now();
-
-    if (_queueDetail != null) {
-      _queueDetail = null;
-      BotToast.closeAllLoading();
-      setState(() {});
-      return;
-    }
-
-    _queueDetail = QueueDetail(
-      date: ConvertDateTimeFormat.convertDateFormat(date: _date),
-      time: ConvertDateTimeFormat.convertTimeFormat(time: _time),
-      queue: 20,
-    );
 
     BotToast.closeAllLoading();
 
     setState(() {
-      isConfirm = false;
+    });
+  }
+
+  Future<void> scanQrCode() async {
+
+    BotToast.showLoading();
+
+    queueData = await queueService.scanQr();
+
+    BotToast.closeAllLoading();
+
+    setState(() {
     });
   }
 
   Future<void> confirmOnSuccess() async {
     BotToast.showLoading();
     await Future.delayed(Duration(seconds: 1));
-
-    _queueDetail?.prefix = 'นางสาว';
-    _queueDetail?.fName = 'lorem';
-    _queueDetail?.lName = 'Ipsum';
-    _queueDetail?.roomName = 'จุดคัดกรอง';
-    _queueDetail?.HN = '00001';
-
     BotToast.closeAllLoading();
     setState(() {
       isConfirm = true;
@@ -366,10 +335,6 @@ class _HomePageState extends State<HomePage> {
     BotToast.showLoading();
 
     await Future.delayed(Duration(seconds: 1));
-
-    _queueDetail!.roomName = "ห้องตรวยอายุรกรรมโซน B";
-    _queueDetail!.queue = 11;
-    _queueDetail!.refNumber = 'ร-07';
 
     BotToast.closeAllLoading();
     setState(() {

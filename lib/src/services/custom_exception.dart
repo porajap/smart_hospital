@@ -11,5 +11,7 @@ class AuthenticationException implements Exception {
 class AuthenticationUnauthorized implements Exception {
   final String message;
 
-  AuthenticationUnauthorized({this.message = 'Unauthorized'}) : super() {}
+  AuthenticationUnauthorized({this.message = 'Unauthorized'}) : super() {
+    NavigationService.navigatorKey.currentContext?.read<AuthBloc>().add(AuthEventTokenInvalid());
+  }
 }

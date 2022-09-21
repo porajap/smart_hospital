@@ -26,7 +26,7 @@ class AuthService {
         throw AuthenticationException(message: '${Constants.textLoginFailed}');
       }
 
-      final _url = Uri.parse('${AppUrl.checkPhoneUrl}/$phone');
+      final _url = Uri.parse('${AppUrl.checkPhone}/$phone');
 
       _response = await http.get(_url).timeout(
         Duration(seconds: 3),
@@ -62,7 +62,7 @@ class AuthService {
 
       final _phone = await prefService.getPhone();
 
-      final _url = Uri.parse('${AppUrl.cretePinUrl}');
+      final _url = Uri.parse('${AppUrl.cretePin}');
 
       Map<String, dynamic> _body = {
         'phone': _phone,
@@ -109,7 +109,7 @@ class AuthService {
 
       final _phone = await prefService.getPhone();
 
-      final _url = Uri.parse('${AppUrl.loginUrl}');
+      final _url = Uri.parse('${AppUrl.login}');
 
       Map<String, dynamic> _body = {
         'phone': _phone,
