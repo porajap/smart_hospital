@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -5,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:smart_hospital/src/bloc/auth/auth_bloc.dart';
 import 'package:smart_hospital/src/model/home/queue_detail_model.dart';
 import 'package:smart_hospital/src/model/home/queue_model.dart';
+import 'package:smart_hospital/src/model/home/queue_of_front_model.dart';
 import 'package:smart_hospital/src/pages/login/login_page.dart';
 import 'package:smart_hospital/src/services/preferences_service.dart';
 import 'package:smart_hospital/src/services/queue_service.dart';
@@ -27,7 +30,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final queueService = QueueService();
 
-  QueueModel queueData = QueueModel(data: Data());
+  QueueModel queueData = QueueModel();
+  QueueOfFrontModel queueOfFrontData = QueueOfFrontModel();
 
   bool isLoading = false;
 
@@ -39,10 +43,18 @@ class _HomePageState extends State<HomePage> {
 
   bool isConfirm = false;
 
+  Timer? timer;
+
   @override
   void initState() {
     queueToday();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -200,7 +212,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget buildDetail() {
-
     var _isConfirm = queueData.data?.isConfirm;
 
     return SingleChildScrollView(
@@ -239,15 +250,15 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget buildQueueDetail() {
-
     var _queueData = queueData.data;
-    var _queueDetail= queueData.data?.queueDetail;
+    var _queueDetail = queueData.data?.queueDetail;
+    var _queueFront = queueOfFrontData.data?.queueOfFront ?? _queueDetail?.queueOfFront ?? 0;
 
     String _queueNo = _queueData?.queueNo ?? "";
     String _roomName = _queueData?.roomName ?? "";
 
     String _queueOfRoom = _queueDetail?.queueOfRoom != null ? '${_queueDetail?.queueOfRoom as int}' : '-';
-    String _queueOfFront = _queueDetail?.queueOfFront != null ? '${_queueDetail?.queueOfFront as int}' : '-';
+    String _queueOfFront = '$_queueFront';
 
     return Container(
       width: MediaQuery.of(context).size.width,
@@ -415,9 +426,17 @@ class _HomePageState extends State<HomePage> {
 
     queueData = await queueService.queueOfUserToday();
 
+    bool _error = queueData.error ?? false;
+    if (!_error) {
+      timerQueueOfFront();
+    }
     setState(() {
       BotToast.closeAllLoading();
     });
+  }
+
+  Future<void> timerQueueOfFront() async {
+    timer = Timer.periodic(Duration(seconds: 10), (Timer t) => queueOfFront());
   }
 
   Future<void> scanQrCode() async {
@@ -427,10 +446,11 @@ class _HomePageState extends State<HomePage> {
 
     bool _error = queueData.error ?? false;
 
-    if(_error){
+    if (_error) {
       queueToday();
       return;
     }
+    timerQueueOfFront();
 
     setState(() {
       BotToast.closeAllLoading();
@@ -445,10 +465,22 @@ class _HomePageState extends State<HomePage> {
     String _queueNo = queueData.data?.queueNo ?? "";
 
     queueData = await queueService.confirmQueue(queueId: _queueId, queueNo: _queueNo, roomId: _roomId);
-
+    bool _error = queueData.error ?? false;
+    if (!_error) {
+      timerQueueOfFront();
+    }
     setState(() {
       BotToast.closeAllLoading();
     });
+  }
+
+  Future<void> queueOfFront() async {
+    String _queueNo = queueData.data?.queueNo ?? "";
+    var _queueOfRoom = queueData.data?.queueDetail?.queueOfRoom ?? 0;
+
+    queueOfFrontData = await queueService.queueOfFront(queueNo: _queueNo, queueOfRoom: _queueOfRoom as int);
+
+    setState(() {});
   }
 
   Future<void> nextRoom() async {

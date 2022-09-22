@@ -11,4 +11,5 @@ class AppUrl{
   static final String scanQr = "$baseUrl/scan-qr";
   static final String queueToday = "$baseUrl/queue-of-user";
   static final String confirmQueue = "$baseUrl/confirm-queue";
+  static final String queueOfFront = "$baseUrl/queue-of-front";
 }

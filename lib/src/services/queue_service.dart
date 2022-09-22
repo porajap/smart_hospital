@@ -3,8 +3,10 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:smart_hospital/src/model/home/queue_model.dart';
+import 'package:smart_hospital/src/model/home/queue_of_front_model.dart';
 import 'package:smart_hospital/src/services/preferences_service.dart';
 import 'package:smart_hospital/src/services/urls.dart';
+import 'package:smart_hospital/src/utils/date_time_format.dart';
 
 import '../pages/my_app.dart';
 import '../utils/constants.dart';
@@ -111,6 +113,50 @@ class QueueService {
       _data = QueueModel.fromJson(_jsonResponse);
 
       logger.w(_data.toJson());
+
+      return _data;
+    } catch (err) {
+      logger.e(err.toString());
+      return _data;
+    }
+  }
+
+  Future<QueueOfFrontModel> queueOfFront({
+    required String queueNo,
+    required int queueOfRoom,
+  }) async {
+    QueueOfFrontModel _data = QueueOfFrontModel();
+
+    try {
+      final _token = await prefService.getToken();
+
+      final _header = {
+        HttpHeaders.authorizationHeader: '$_token',
+      };
+
+      final _dateNow = ConvertDateTimeFormat.convertDateFormat(date: DateTime.now(), format: "yyy-MM-dd");
+
+      Map<String, dynamic> _body = {
+        "createdAt": '$_dateNow',
+        "queueNo": '$queueNo',
+        "queueOfRoom": '$queueOfRoom',
+      };
+
+      final _url = Uri.parse('${AppUrl.queueOfFront}');
+
+      final _response = await http.post(
+        _url,
+        headers: _header,
+        body: _body,
+      );
+
+      if (_response.statusCode == 401) {
+        throw AuthenticationUnauthorized();
+      }
+
+      final _jsonResponse = json.decode(_response.body);
+
+      _data = QueueOfFrontModel.fromJson(_jsonResponse);
 
       return _data;
     } catch (err) {
