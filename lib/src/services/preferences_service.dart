@@ -42,7 +42,7 @@ class SharedPreferencesService {
     _prefs.setString(PreferenceKey.fName, data.data?.fName ?? "");
     _prefs.setString(PreferenceKey.lName, data.data?.lName ?? "");
     _prefs.setString(PreferenceKey.hospitalName, data.data?.hospitalName ?? "");
-    _prefs.setInt(PreferenceKey.hospitalName, data.data?.role as int);
+    _prefs.setInt(PreferenceKey.role, data.data?.role as int);
     _prefs.setString(PreferenceKey.token, data.token ?? "");
   }
 

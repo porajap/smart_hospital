@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:smart_hospital/src/model/dashboard/data_of_year_model.dart';
 import 'package:smart_hospital/src/utils/app_theme.dart';
 import 'package:smart_hospital/src/utils/my_widget.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
+import '../../model/dashboard/data_of_year_model.dart';
+import '../../services/dashboard_service.dart';
 import '../../utils/app_bar.dart';
 import '../../utils/my_dialog.dart';
 import '../login/login_page.dart';
@@ -20,7 +23,59 @@ class Dashboard extends StatefulWidget {
   }
 }
 
+class DataSourceOfYear {
+  DataSourceOfYear({required this.month, required this.total, required this.monthName});
+
+  final String month;
+  final String monthName;
+  final int total;
+}
+
 class _DashboardState extends State<Dashboard> {
+  DashboardService dashboardService = DashboardService();
+  DataOfYearModel dataOfYear = DataOfYearModel();
+
+  List<DataSourceOfYear> menData = [];
+  List<DataSourceOfYear> femaleData = [];
+
+  @override
+  void initState() {
+    getDataOfYear();
+    super.initState();
+  }
+
+  Future<void> getDataOfYear() async {
+    dataOfYear = await dashboardService.getDataOfYear();
+
+    if (dataOfYear.data?.men != null) {
+      var _data = dataOfYear.data?.men ?? [];
+      for (var item in _data) {
+        var _total = item.total ?? 0;
+        menData.add(DataSourceOfYear(
+          month: '${item.month}',
+          total: _total as int,
+          monthName: '${item.monthName}',
+        ));
+      }
+    }
+
+    if (dataOfYear.data?.female != null) {
+      var _data = dataOfYear.data?.female ?? [];
+      for (var item in _data) {
+        var _total = item.total ?? 0;
+        femaleData.add(DataSourceOfYear(
+          month: '${item.month}',
+          total: _total as int,
+          monthName: '${item.monthName}',
+        ));
+      }
+    }
+
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -253,22 +308,6 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  List<_ChartData> chartDataMen = <_ChartData>[
-    _ChartData((DateTime(2022, 6)), 568),
-    _ChartData((DateTime(2022, 7)), 787),
-    _ChartData((DateTime(2022, 8)), 867),
-    _ChartData((DateTime(2022, 9)), 898),
-    _ChartData((DateTime(2022, 10)), 450),
-  ];
-
-  List<_ChartData> chartDataWomen = <_ChartData>[
-    _ChartData((DateTime(2022, 6)), 550),
-    _ChartData((DateTime(2022, 7)), 766),
-    _ChartData((DateTime(2022, 8)), 879),
-    _ChartData((DateTime(2022, 9)), 246),
-    _ChartData((DateTime(2022, 10)), 159),
-  ];
-
   SfCartesianChart _buildDefaultLineChart() {
     return SfCartesianChart(
       plotAreaBorderWidth: 0,
@@ -279,39 +318,41 @@ class _DashboardState extends State<Dashboard> {
         position: LegendPosition.bottom,
       ),
       title: ChartTitle(text: 'Over all Patients of Month 2022'),
-      primaryXAxis: DateTimeAxis(
-        edgeLabelPlacement: EdgeLabelPlacement.shift,
-        dateFormat: DateFormat.MMM(),
-        intervalType: DateTimeIntervalType.months,
-      ),
-      primaryYAxis: NumericAxis(
-        labelFormat: '{value}',
-        interval: 100,
-        majorGridLines: MajorGridLines(color: Colors.transparent),
-      ),
+      primaryXAxis: _categoryAxis(),
+      primaryYAxis: _numericAxis(text: 'คน'),
       series: _getDefaultLineSeries(),
       tooltipBehavior: TooltipBehavior(enable: true),
     );
   }
 
-  List<LineSeries<_ChartData, DateTime>> _getDefaultLineSeries() {
+  NumericAxis _numericAxis({required String text}) => NumericAxis(
+        title: AxisTitle(
+          text: '$text',
+        ),
+      );
+
+  CategoryAxis _categoryAxis() => CategoryAxis(
+        labelRotation: 0,
+      );
+
+  List<LineSeries<DataSourceOfYear, String>> _getDefaultLineSeries() {
     return [
-      LineSeries<_ChartData, DateTime>(
+      LineSeries<DataSourceOfYear, String>(
         animationDuration: 2500,
-        dataSource: chartDataMen,
-        xValueMapper: (_ChartData sales, _) => sales.x,
-        yValueMapper: (_ChartData sales, _) => sales.y,
+        dataSource: menData,
         width: 2,
         name: 'ชาย',
+        xValueMapper: (DataSourceOfYear data, _) => data.monthName,
+        yValueMapper: (DataSourceOfYear data, _) => data.total,
         markerSettings: MarkerSettings(isVisible: true),
       ),
-      LineSeries<_ChartData, DateTime>(
+      LineSeries<DataSourceOfYear, String>(
         animationDuration: 2500,
-        dataSource: chartDataWomen!,
+        dataSource: femaleData,
         width: 2,
         name: 'หญิง',
-        xValueMapper: (_ChartData sales, _) => sales.x,
-        yValueMapper: (_ChartData sales, _) => sales.y,
+        xValueMapper: (DataSourceOfYear data, _) => data.monthName,
+        yValueMapper: (DataSourceOfYear data, _) => data.total,
         markerSettings: MarkerSettings(isVisible: true),
       )
     ];
@@ -364,14 +405,4 @@ class buildTitle extends StatelessWidget {
       ],
     );
   }
-}
-
-class _ChartData {
-  _ChartData(
-    this.x,
-    this.y,
-  );
-
-  final DateTime x;
-  final double y;
 }

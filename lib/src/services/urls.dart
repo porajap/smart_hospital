@@ -12,4 +12,6 @@ class AppUrl{
   static final String queueToday = "$baseUrl/queue-of-user";
   static final String confirmQueue = "$baseUrl/confirm-queue";
   static final String queueOfFront = "$baseUrl/queue-of-front";
+
+  static final String dataOfYear = "$baseUrl/data-of-year";
 }
