@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:smart_hospital/src/model/dashboard/data_of_day_model.dart';
 import 'package:smart_hospital/src/model/dashboard/data_of_year_model.dart';
 import 'package:smart_hospital/src/utils/app_theme.dart';
 import 'package:smart_hospital/src/utils/my_widget.dart';
@@ -11,6 +12,7 @@ import '../../services/dashboard_service.dart';
 import '../../utils/app_bar.dart';
 import '../../utils/my_dialog.dart';
 import '../login/login_page.dart';
+import '../my_app.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -34,14 +36,28 @@ class DataSourceOfYear {
 class _DashboardState extends State<Dashboard> {
   DashboardService dashboardService = DashboardService();
   DataOfYearModel dataOfYear = DataOfYearModel();
+  DataOfDayModel dataOfDay = DataOfDayModel();
 
   List<DataSourceOfYear> menData = [];
   List<DataSourceOfYear> femaleData = [];
 
   @override
   void initState() {
-    getDataOfYear();
+    getData();
     super.initState();
+  }
+
+  Future<void> getData() async{
+    await getDataOfDay();
+    await getDataOfYear();
+
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  Future<void> getDataOfDay() async{
+    dataOfDay = await dashboardService.getDataOfDay();
   }
 
   Future<void> getDataOfYear() async {
@@ -71,9 +87,6 @@ class _DashboardState extends State<Dashboard> {
       }
     }
 
-    if (mounted) {
-      setState(() {});
-    }
   }
 
   @override
@@ -126,145 +139,150 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Widget buildTotalVisit() => Card(
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          padding: EdgeInsets.symmetric(vertical: 15, horizontal: 5),
-          child: Column(
-            children: [
-              Text("Total Visit", style: Theme.of(context).textTheme.headline1),
-              Text(
-                "Last updated 2.00 PM",
-                style: TextStyle(fontSize: 12, color: AppColor.textPrimaryColor.withOpacity(0.5)),
+  Widget buildTotalVisit() {
+    var _total = dataOfDay.data?.countPatient ?? 0;
+    var _lastUpdate = dataOfDay.data?.lastUpdated ?? "";
+
+    return Card(
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 5),
+        child: Column(
+          children: [
+            Text("Total Visit", style: Theme.of(context).textTheme.headline1),
+            Text(
+              "Last updated $_lastUpdate",
+              style: TextStyle(fontSize: 12, color: AppColor.textPrimaryColor.withOpacity(0.5)),
+            ),
+            SizedBox(height: 20),
+            Text(
+              "$_total",
+              style: TextStyle(
+                fontSize: 36,
+                color: AppColor.textPrimaryColor,
+                fontWeight: FontWeight.w900,
               ),
-              SizedBox(height: 20),
-              Text(
-                "600",
-                style: TextStyle(
-                  fontSize: 36,
-                  color: AppColor.textPrimaryColor,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-              Text(
-                "Patient(s)",
-                style: TextStyle(fontSize: 12, color: AppColor.textPrimaryColor.withOpacity(0.5)),
-              ),
-              SizedBox(height: 10),
-              Divider(height: 1),
-              SizedBox(height: 10),
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 50,
-                              height: 50,
-                              child: _buildRangePointerExampleGauge(),
-                            ),
-                            SizedBox(width: 10),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  "Appointment",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColor.textPrimaryColor,
-                                  ),
-                                ),
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      "450",
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColor.textPrimaryColor,
-                                      ),
-                                    ),
-                                    SizedBox(width: 15),
-                                    Text(
-                                      "Patient(s)",
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        color: AppColor.textSecondaryColor,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    VerticalDivider(
-                      width: 20,
-                      thickness: 1,
-                      indent: 20,
-                      endIndent: 0,
-                      color: Colors.red,
-                    ),
-                    Container(
+            ),
+            Text(
+              "Patient(s)",
+              style: TextStyle(fontSize: 12, color: AppColor.textPrimaryColor.withOpacity(0.5)),
+            ),
+            SizedBox(height: 10),
+            Divider(height: 1),
+            SizedBox(height: 10),
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Expanded(
+                    child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
+                      child: Row(
                         children: [
-                          Text(
-                            "Walk in",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: AppColor.textPrimaryColor,
-                            ),
+                          Container(
+                            width: 50,
+                            height: 50,
+                            child: _buildRangePointerExampleGauge(),
                           ),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
+                          SizedBox(width: 10),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                "150",
+                                "Appointment",
                                 style: TextStyle(
-                                  fontSize: 20,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color: AppColor.textPrimaryColor,
                                 ),
                               ),
-                              SizedBox(width: 15),
-                              Text(
-                                "Patient(s)",
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: AppColor.textSecondaryColor,
-                                ),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    "450",
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColor.textPrimaryColor,
+                                    ),
+                                  ),
+                                  SizedBox(width: 15),
+                                  Text(
+                                    "Patient(s)",
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: AppColor.textSecondaryColor,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
                         ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  VerticalDivider(
+                    width: 20,
+                    thickness: 1,
+                    indent: 20,
+                    endIndent: 0,
+                    color: Colors.red,
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          "Walk in",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: AppColor.textPrimaryColor,
+                          ),
+                        ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              "150",
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: AppColor.textPrimaryColor,
+                              ),
+                            ),
+                            SizedBox(width: 15),
+                            Text(
+                              "Patient(s)",
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: AppColor.textSecondaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      );
+      ),
+    );
+  }
 
   SfRadialGauge _buildRangePointerExampleGauge() {
     return SfRadialGauge(

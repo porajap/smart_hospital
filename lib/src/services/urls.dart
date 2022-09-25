@@ -14,4 +14,5 @@ class AppUrl{
   static final String queueOfFront = "$baseUrl/queue-of-front";
 
   static final String dataOfYear = "$baseUrl/data-of-year";
+  static final String dataOfDay= "$baseUrl/data-of-day";
 }
