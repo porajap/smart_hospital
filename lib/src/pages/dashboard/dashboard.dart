@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_hospital/src/model/dashboard/data_of_day_model.dart';
 import 'package:smart_hospital/src/model/dashboard/data_of_year_model.dart';
@@ -7,6 +8,7 @@ import 'package:smart_hospital/src/utils/my_widget.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
+import '../../bloc/auth/auth_bloc.dart';
 import '../../model/dashboard/data_of_year_model.dart';
 import '../../services/dashboard_service.dart';
 import '../../utils/app_bar.dart';
@@ -100,11 +102,7 @@ class _DashboardState extends State<Dashboard> {
             MyDialog.dialogConfirm(
               context: context,
               callback: () {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginPage()),
-                  ModalRoute.withName('/login'),
-                );
+                context.read<AuthBloc>().add(AuthEventLoggedOut());
               },
               title: "ออกจากระบบ",
               msg: 'คุณต้องการออกจากระบบใช่หรือไม่?',
@@ -168,33 +166,87 @@ class _DashboardState extends State<Dashboard> {
               style: TextStyle(fontSize: 12, color: AppColor.textPrimaryColor.withOpacity(0.5)),
             ),
             SizedBox(height: 10),
-            Divider(height: 1),
-            SizedBox(height: 10),
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
+            Visibility(
+              visible: true,
+              child: Column(
                 children: [
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 50,
-                            height: 50,
-                            child: _buildRangePointerExampleGauge(),
+                  Divider(height: 1),
+                  SizedBox(height: 10),
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 50,
+                                  height: 50,
+                                  child: _buildRangePointerExampleGauge(),
+                                ),
+                                SizedBox(width: 10),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      "Appointment",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColor.textPrimaryColor,
+                                      ),
+                                    ),
+                                    Row(
+                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                          "450",
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColor.textPrimaryColor,
+                                          ),
+                                        ),
+                                        SizedBox(width: 15),
+                                        Text(
+                                          "Patient(s)",
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            color: AppColor.textSecondaryColor,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                          SizedBox(width: 10),
-                          Column(
+                        ),
+                        VerticalDivider(
+                          width: 20,
+                          thickness: 1,
+                          indent: 20,
+                          endIndent: 0,
+                          color: Colors.red,
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                "Appointment",
+                                "Walk in",
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -205,7 +257,7 @@ class _DashboardState extends State<Dashboard> {
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   Text(
-                                    "450",
+                                    "150",
                                     style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
@@ -224,53 +276,6 @@ class _DashboardState extends State<Dashboard> {
                               ),
                             ],
                           ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  VerticalDivider(
-                    width: 20,
-                    thickness: 1,
-                    indent: 20,
-                    endIndent: 0,
-                    color: Colors.red,
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "Walk in",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: AppColor.textPrimaryColor,
-                          ),
-                        ),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              "150",
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: AppColor.textPrimaryColor,
-                              ),
-                            ),
-                            SizedBox(width: 15),
-                            Text(
-                              "Patient(s)",
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: AppColor.textSecondaryColor,
-                              ),
-                            ),
-                          ],
                         ),
                       ],
                     ),

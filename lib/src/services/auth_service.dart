@@ -35,6 +35,8 @@ class AuthService {
         },
       );
 
+      logger.i(_response.body);
+
       if (_response.statusCode == 200) {
         final _jsonResponse = json.decode(_response.body);
         _data = CheckPhoneModel.fromJson(_jsonResponse);

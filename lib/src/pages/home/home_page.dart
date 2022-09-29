@@ -54,6 +54,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void dispose() {
     timer?.cancel();
+    logger.i('timer active: ${timer?.isActive}');
     super.dispose();
   }
 
