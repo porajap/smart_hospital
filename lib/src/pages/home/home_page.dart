@@ -4,10 +4,12 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:smart_hospital/src/bloc/auth/auth_bloc.dart';
 import 'package:smart_hospital/src/model/home/queue_detail_model.dart';
 import 'package:smart_hospital/src/model/home/queue_model.dart';
 import 'package:smart_hospital/src/model/home/queue_of_front_model.dart';
+import 'package:smart_hospital/src/pages/home/scan_page.dart';
 import 'package:smart_hospital/src/pages/login/login_page.dart';
 import 'package:smart_hospital/src/services/preferences_service.dart';
 import 'package:smart_hospital/src/services/queue_service.dart';
@@ -42,7 +44,7 @@ class _HomePageState extends State<HomePage> {
   double roomLongitude = 98.937154;
 
   bool isConfirm = false;
-
+  Barcode? qrCodeResult;
   Timer? timer;
 
   @override
@@ -57,6 +59,15 @@ class _HomePageState extends State<HomePage> {
     logger.i('timer active: ${timer?.isActive}');
     super.dispose();
   }
+
+  Future openScanPage() async {
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => ScanPage())).then((value) {
+      if (value != null) {
+        getQueueNo();
+      }
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +98,7 @@ class _HomePageState extends State<HomePage> {
             child: queueData.data == null
                 ? Center(
                     child: Text(
-                      "สแกนคิวอาร์โค้ดเพื่อจองคิว",
+                      "สแกนคิวอาร์โค้ดเพื่อดูรายละเอียด",
                       style: Theme.of(context).textTheme.headline1,
                     ),
                   )
@@ -96,7 +107,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: scanQrCode,
+        onPressed: openScanPage,
         tooltip: "สแกนคิวอาร์โค้ด",
         child: Icon(Icons.qr_code_scanner_rounded),
       ),
@@ -443,7 +454,25 @@ class _HomePageState extends State<HomePage> {
   Future<void> scanQrCode() async {
     BotToast.showLoading();
 
-    queueData = await queueService.scanQr();
+    queueData = await queueService.booking();
+
+    bool _error = queueData.error ?? false;
+
+    if (_error) {
+      queueToday();
+      return;
+    }
+    timerQueueOfFront();
+
+    setState(() {
+      BotToast.closeAllLoading();
+    });
+  }
+
+  Future<void> getQueueNo() async {
+    BotToast.showLoading();
+
+    queueData = await queueService.getQueueByNo(queueNo: qrCodeResult?.code ?? "");
 
     bool _error = queueData.error ?? false;
 

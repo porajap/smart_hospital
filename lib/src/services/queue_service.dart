@@ -44,7 +44,7 @@ class QueueService {
     }
   }
 
-  Future<QueueModel> scanQr() async {
+  Future<QueueModel> booking() async {
     QueueModel _data = QueueModel();
 
     try {
@@ -54,7 +54,7 @@ class QueueService {
         HttpHeaders.authorizationHeader: '$_token',
       };
 
-      final _url = Uri.parse('${AppUrl.scanQr}');
+      final _url = Uri.parse('${AppUrl.booking}');
 
       final _response = await http.post(_url, headers: _header);
 
@@ -71,6 +71,37 @@ class QueueService {
       return _data;
     } catch (err) {
       logger.e(err);
+      return _data;
+    }
+  }
+
+  Future<QueueModel> getQueueByNo({required String queueNo}) async {
+    QueueModel _data = QueueModel();
+
+    try {
+      final _token = await prefService.getToken();
+
+      final _header = {
+        HttpHeaders.authorizationHeader: '$_token',
+      };
+
+      final _url = Uri.parse('${AppUrl.queueByNo}/${queueNo}');
+
+      final _response = await http.get(_url, headers: _header);
+
+      if (_response.statusCode == 401) {
+        throw AuthenticationUnauthorized();
+      }
+
+      final _jsonResponse = json.decode(_response.body);
+
+
+      _data = QueueModel.fromJson(_jsonResponse);
+
+
+      return _data;
+    } catch (err) {
+      logger.e(err.toString());
       return _data;
     }
   }
@@ -102,7 +133,7 @@ class QueueService {
         headers: _header,
         body: _body,
       );
-      logger.w(_response.statusCode );
+      logger.w(_response.statusCode);
 
       if (_response.statusCode == 401) {
         throw AuthenticationUnauthorized();
