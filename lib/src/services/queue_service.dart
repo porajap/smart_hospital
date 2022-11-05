@@ -173,6 +173,7 @@ class QueueService {
         "queueOfRoom": '$queueOfRoom',
       };
 
+
       final _url = Uri.parse('${AppUrl.queueOfFront}');
 
       final _response = await http.post(

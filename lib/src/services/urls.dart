@@ -1,6 +1,6 @@
 class AppUrl{
-  static final String devUrl = "http://192.168.1.111:4002/api";
-  static final String productionUrl = "";
+  static final String devUrl = "http://192.168.1.110:4002/api";
+  static final String productionUrl = "http://re-loader.com:4002/api";
 
   static final String baseUrl = devUrl;
 

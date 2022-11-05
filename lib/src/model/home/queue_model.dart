@@ -124,8 +124,8 @@ class UserDetail {
   UserDetail({
       this.id, 
       this.hnCode, 
-      this.hospitalCode, 
-      this.hospitalName, 
+      this.organizeId, 
+      this.organizeName, 
       this.fNameTh, 
       this.mNameTh, 
       this.lNameTh, 
@@ -136,8 +136,8 @@ class UserDetail {
   UserDetail.fromJson(dynamic json) {
     id = json['id'];
     hnCode = json['HnCode'];
-    hospitalCode = json['hospitalCode'];
-    hospitalName = json['hospitalName'];
+    organizeId = json['organizeId'];
+    organizeName = json['organizeName'];
     fNameTh = json['fNameTh'];
     mNameTh = json['mNameTh'];
     lNameTh = json['lNameTh'];
@@ -147,28 +147,28 @@ class UserDetail {
   }
   num? id;
   String? hnCode;
-  num? hospitalCode;
-  String? hospitalName;
+  num? organizeId;
+  String? organizeName;
   String? fNameTh;
-  dynamic mNameTh;
+  String? mNameTh;
   String? lNameTh;
   String? fNameEng;
-  dynamic mNameEng;
+  String? mNameEng;
   String? lNameEng;
 UserDetail copyWith({  num? id,
   String? hnCode,
-  num? hospitalCode,
-  String? hospitalName,
+  num? organizeId,
+  String? organizeName,
   String? fNameTh,
-  dynamic mNameTh,
+  String? mNameTh,
   String? lNameTh,
   String? fNameEng,
-  dynamic mNameEng,
+  String? mNameEng,
   String? lNameEng,
 }) => UserDetail(  id: id ?? this.id,
   hnCode: hnCode ?? this.hnCode,
-  hospitalCode: hospitalCode ?? this.hospitalCode,
-  hospitalName: hospitalName ?? this.hospitalName,
+  organizeId: organizeId ?? this.organizeId,
+  organizeName: organizeName ?? this.organizeName,
   fNameTh: fNameTh ?? this.fNameTh,
   mNameTh: mNameTh ?? this.mNameTh,
   lNameTh: lNameTh ?? this.lNameTh,
@@ -180,8 +180,8 @@ UserDetail copyWith({  num? id,
     final map = <String, dynamic>{};
     map['id'] = id;
     map['HnCode'] = hnCode;
-    map['hospitalCode'] = hospitalCode;
-    map['hospitalName'] = hospitalName;
+    map['organizeId'] = organizeId;
+    map['organizeName'] = organizeName;
     map['fNameTh'] = fNameTh;
     map['mNameTh'] = mNameTh;
     map['lNameTh'] = lNameTh;

@@ -42,30 +42,30 @@ class Data {
       this.phone, 
       this.fName, 
       this.lName, 
-      this.hospitalName, 
+      this.organizeName, 
       this.role,});
 
   Data.fromJson(dynamic json) {
     phone = json['phone'];
     fName = json['fName'];
     lName = json['lName'];
-    hospitalName = json['hospitalName'];
+    organizeName = json['organizeName'];
     role = json['role'];
   }
   String? phone;
   String? fName;
   String? lName;
-  String? hospitalName;
+  String? organizeName;
   num? role;
 Data copyWith({  String? phone,
   String? fName,
   String? lName,
-  String? hospitalName,
+  String? organizeName,
   num? role,
 }) => Data(  phone: phone ?? this.phone,
   fName: fName ?? this.fName,
   lName: lName ?? this.lName,
-  hospitalName: hospitalName ?? this.hospitalName,
+  organizeName: organizeName ?? this.organizeName,
   role: role ?? this.role,
 );
   Map<String, dynamic> toJson() {
@@ -73,7 +73,7 @@ Data copyWith({  String? phone,
     map['phone'] = phone;
     map['fName'] = fName;
     map['lName'] = lName;
-    map['hospitalName'] = hospitalName;
+    map['organizeName'] = organizeName;
     map['role'] = role;
     return map;
   }

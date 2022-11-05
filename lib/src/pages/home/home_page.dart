@@ -438,13 +438,16 @@ class _HomePageState extends State<HomePage> {
 
     queueData = await queueService.queueOfUserToday();
 
+    setState(() {
+
+    });
+
     bool _error = queueData.error ?? false;
     if (!_error) {
       timerQueueOfFront();
     }
-    setState(() {
-      BotToast.closeAllLoading();
-    });
+    BotToast.closeAllLoading();
+
   }
 
   Future<void> timerQueueOfFront() async {
@@ -455,6 +458,8 @@ class _HomePageState extends State<HomePage> {
     BotToast.showLoading();
 
     queueData = await queueService.booking();
+    setState(() {
+    });
 
     bool _error = queueData.error ?? false;
 
@@ -463,10 +468,9 @@ class _HomePageState extends State<HomePage> {
       return;
     }
     timerQueueOfFront();
+    BotToast.closeAllLoading();
 
-    setState(() {
-      BotToast.closeAllLoading();
-    });
+
   }
 
   Future<void> getQueueNo() async {
