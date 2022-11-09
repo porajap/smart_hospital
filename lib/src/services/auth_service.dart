@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'package:smart_hospital/src/model/login/logged_model.dart';
 import 'package:smart_hospital/src/services/preferences_service.dart';
@@ -12,6 +13,7 @@ import '../model/login/check_phone_model.dart';
 import '../pages/my_app.dart';
 import '../utils/constants.dart';
 import 'custom_exception.dart';
+import 'notification_service.dart';
 
 class AuthService {
   final prefService = SharedPreferencesService();
@@ -137,8 +139,8 @@ class AuthService {
       if(!_error){
         await prefService.setIsLoggedIn(isLogin: true);
         await prefService.setUserLoggedIn(data: _data);
+        FirebaseMessaging.instance.getToken().then(setTokenFCM);
       }
-
 
       return _data;
     } on SocketException {
@@ -149,6 +151,20 @@ class AuthService {
       logger.e(err);
       return _data;
     }
+  }
+
+  void setTokenFCM(String? token) async{
+    logger.w('FCM Token: $token');
+
+    var _notifyService = NotificationService();
+
+    await _notifyService.addToken(token: token ?? "", platform: Platform.isAndroid ? "android" : "ios");
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      if (message.notification != null) {
+        pushNotificationService.showFlutterNotification(message);
+      }
+    });
   }
 
   Future<void> logout() async {
