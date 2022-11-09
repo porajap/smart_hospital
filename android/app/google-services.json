@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "673661411856",
+    "project_id": "flutter-notification-b1db3",
+    "storage_bucket": "flutter-notification-b1db3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:673661411856:android:671594b0eb8c5872c92095",
+        "android_client_info": {
+          "package_name": "com.example.smart_hospital"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "673661411856-3a9usuna809v3ul2pov2gncud89gfse8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA0kvfTz1YKBcP_HlAFXNnK5hp5xVBLzDg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "673661411856-3a9usuna809v3ul2pov2gncud89gfse8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
