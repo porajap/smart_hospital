@@ -1,8 +1,8 @@
 class AppUrl{
   static final String devUrl = "http://192.168.1.110:4002/api";
-  static final String productionUrl = "http://re-loader.com:4002/api";
+  static final String productionUrl = "https://re-loader.com/api_smarthospital/api";
 
-  static final String baseUrl = devUrl;
+  static final String baseUrl = productionUrl;
 
   static final String checkPhone = "$baseUrl/check-phone";
   static final String cretePin = "$baseUrl/create-pin";

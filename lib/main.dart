@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +19,7 @@ import 'package:smart_hospital/src/utils/constants.dart';
 
 void main() async {
   await Hive.initFlutter();
+  HttpOverrides.global = MyHttpOverrides();
   BlocOverrides.runZoned(
     () {
       runApp(
@@ -38,4 +41,12 @@ void main() async {
     },
     blocObserver: SimpleBlocObserver(),
   );
+}
+
+class MyHttpOverrides extends HttpOverrides{
+  @override
+  HttpClient createHttpClient(SecurityContext? context){
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (X509Certificate cert, String host, int port)=> true;
+  }
 }
