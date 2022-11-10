@@ -4,6 +4,7 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:smart_hospital/src/bloc/auth/auth_bloc.dart';
@@ -41,8 +42,8 @@ class _HomePageState extends State<HomePage> {
   final GeolocatorPlatform _geoLocator = GeolocatorPlatform.instance;
 
   double destination = 0;
-  double roomLatitude = 18.764691;
-  double roomLongitude = 98.937154;
+  double roomLatitude = 18.77021350974426;
+  double roomLongitude = 98.97541530144976;
 
   bool isConfirm = false;
   Barcode? qrCodeResult;
@@ -51,6 +52,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     queueToday();
+    _getCurrentPosition();
     super.initState();
   }
 
@@ -545,15 +547,34 @@ class _HomePageState extends State<HomePage> {
       ),
     );
 
+    logger.i(position);
+
     destination = await _geoLocator.distanceBetween(
       position.latitude,
       position.longitude,
       roomLatitude,
       roomLongitude,
     );
+
+    logger.w("Destination ${destination.round()} M"); //to m.
+
+    List<Placemark> startPlaceMarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude
+    );
+    Placemark startPlace = startPlaceMarks[0];
+    logger.w(startPlace);
+
+    List<Placemark> endPlaceMarks = await placemarkFromCoordinates(
+        roomLatitude,
+        roomLongitude
+    );
+    Placemark endPlace = endPlaceMarks[0];
+    logger.w(endPlace);
+
     BotToast.closeAllLoading();
 
-    if (destination > 20) {
+    if (destination.round() > 20) {
       MyDialog.dialogCustom(
         context: context,
         title: "ผิดพลาด",
@@ -562,7 +583,6 @@ class _HomePageState extends State<HomePage> {
       );
     }
 
-    setState(() {});
   }
 
   Future<bool> _handlePermission() async {
