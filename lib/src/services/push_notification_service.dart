@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../../firebase_options.dart';
+import '../pages/my_app.dart';
 
 class PushNotificationService {
   late AndroidNotificationChannel channel;
@@ -11,6 +12,7 @@ class PushNotificationService {
   bool isFlutterLocalNotificationsInitialized = false;
 
   Future<void> setupFlutterNotifications() async {
+    logger.i("setupFlutterNotifications");
     if (isFlutterLocalNotificationsInitialized) {
       return;
     }

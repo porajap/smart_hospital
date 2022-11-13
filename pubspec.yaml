@@ -41,6 +41,9 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
+flutter_launcher_name:
+  name: "Smart Hospital"
+
 
 
 flutter:

@@ -22,6 +22,7 @@ import 'package:smart_hospital/src/utils/my_widget.dart';
 
 import '../../../main.dart';
 import '../../utils/app_bar.dart';
+import '../../utils/constants.dart';
 import '../my_app.dart';
 
 class HomePage extends StatefulWidget {
@@ -52,7 +53,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     queueToday();
-    _getCurrentPosition();
+    // _getCurrentPosition();
     super.initState();
   }
 
@@ -70,7 +71,6 @@ class _HomePageState extends State<HomePage> {
       }
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -133,8 +133,7 @@ class _HomePageState extends State<HomePage> {
               IconButton(
                 splashRadius: 20,
                 icon: Icon(Icons.bookmark_add),
-                onPressed: () {
-                },
+                onPressed: () {},
               ),
             ],
           ),
@@ -442,16 +441,17 @@ class _HomePageState extends State<HomePage> {
 
     queueData = await queueService.queueOfUserToday();
 
-    setState(() {
+    if (queueData.data?.userDetail?.hnCode == "" || queueData.data?.userDetail?.hnCode == null) {
+      dialogEditHnCode();
+    }
 
-    });
+    setState(() {});
 
     bool _error = queueData.error ?? false;
     if (!_error) {
       timerQueueOfFront();
     }
     BotToast.closeAllLoading();
-
   }
 
   Future<void> timerQueueOfFront() async {
@@ -462,8 +462,7 @@ class _HomePageState extends State<HomePage> {
     BotToast.showLoading();
 
     queueData = await queueService.booking();
-    setState(() {
-    });
+    setState(() {});
 
     bool _error = queueData.error ?? false;
 
@@ -473,8 +472,6 @@ class _HomePageState extends State<HomePage> {
     }
     timerQueueOfFront();
     BotToast.closeAllLoading();
-
-
   }
 
   Future<void> getQueueNo() async {
@@ -521,17 +518,6 @@ class _HomePageState extends State<HomePage> {
     setState(() {});
   }
 
-  Future<void> nextRoom() async {
-    BotToast.showLoading();
-
-    await Future.delayed(Duration(seconds: 1));
-
-    BotToast.closeAllLoading();
-    setState(() {
-      isConfirm = true;
-    });
-  }
-
   Future<void> _getCurrentPosition() async {
     BotToast.showLoading();
 
@@ -558,31 +544,24 @@ class _HomePageState extends State<HomePage> {
 
     logger.w("Destination ${destination.round()} M"); //to m.
 
-    List<Placemark> startPlaceMarks = await placemarkFromCoordinates(
-        position.latitude,
-        position.longitude
-    );
+    List<Placemark> startPlaceMarks = await placemarkFromCoordinates(position.latitude, position.longitude);
     Placemark startPlace = startPlaceMarks[0];
     logger.w(startPlace);
 
-    List<Placemark> endPlaceMarks = await placemarkFromCoordinates(
-        roomLatitude,
-        roomLongitude
-    );
+    List<Placemark> endPlaceMarks = await placemarkFromCoordinates(roomLatitude, roomLongitude);
     Placemark endPlace = endPlaceMarks[0];
     logger.w(endPlace);
 
     BotToast.closeAllLoading();
 
-    if (destination.round() > 20) {
-      MyDialog.dialogCustom(
-        context: context,
-        title: "ผิดพลาด",
-        msg: 'คุณอยู่ห่างจากห้องมากกว่า 20 ม. ไม่สามารถยืนยันคิวได้',
-        callback: () {},
-      );
-    }
-
+    // if (destination.round() > 20) {
+    //   MyDialog.dialogCustom(
+    //     context: context,
+    //     title: "ผิดพลาด",
+    //     msg: 'คุณอยู่ห่างจากห้องมากกว่า 20 ม. ไม่สามารถยืนยันคิวได้',
+    //     callback: () {},
+    //   );
+    // }
   }
 
   Future<bool> _handlePermission() async {
@@ -606,5 +585,89 @@ class _HomePageState extends State<HomePage> {
       return false;
     }
     return true;
+  }
+
+  var _hnFormKey = GlobalKey<FormState>();
+  TextEditingController _hnController = TextEditingController(text: "");
+
+  void dialogEditHnCode() {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          contentPadding: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+          content: Container(
+            child: Form(
+              key: _hnFormKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    "กรุณากรอก HN",
+                    style: Theme.of(context).textTheme.headline1,
+                  ),
+                  SizedBox(height: 10),
+                  InputHeight(
+                    child: TextFormField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "กรุณากรอกเลข HN หรือติดต่อเจ้าหน้าที่";
+                        }
+
+                        return null;
+                      },
+                      controller: _hnController,
+                      keyboardType: TextInputType.url,
+                      decoration: InputDecoration(
+                        hintText: "กรุณากรอกเลข HN หรือติดต่อเจ้าหน้าที่",
+                        errorStyle: TextStyle(height: 0.5),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () => {
+                              _hnController.text = "",
+                            },
+                            style: ElevatedButton.styleFrom(primary: AppColor.grayColor, elevation: 0),
+                            child: Text(
+                              "${Constants.textClear}",
+                              style: TextStyle(color: AppColor.textPrimaryColor.withOpacity(0.7)),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              var _result = await queueService.updateHnCode(hnCode: _hnController.text.trim());
+
+                              queueToday();
+
+                              Navigator.pop(context);
+
+                              BotToast.showText(text: "บันทึกสำเร็จ");
+                            },
+                            style: ElevatedButton.styleFrom(elevation: 0),
+                            child: Text("${Constants.textConfirm}"),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 }

@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyA0kvfTz1YKBcP_HlAFXNnK5hp5xVBLzDg',
-    appId: '1:673661411856:android:671594b0eb8c5872c92095',
+    appId: '1:673661411856:android:356041eb6a2e44ddc92095',
     messagingSenderId: '673661411856',
     projectId: 'flutter-notification-b1db3',
     storageBucket: 'flutter-notification-b1db3.appspot.com',
@@ -59,7 +59,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAJm2hCgNwZ1K8YGXiJpkzyDEXuGEYpWn4',
-    appId: '1:673661411856:ios:dd05803c06aac898c92095',
+    appId: '1:673661411856:ios:bf0121c591141adfc92095',
     messagingSenderId: '673661411856',
     projectId: 'flutter-notification-b1db3',
     storageBucket: 'flutter-notification-b1db3.appspot.com',

@@ -1,24 +1,15 @@
 import 'dart:io';
 
-import 'package:bot_toast/bot_toast.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hive/hive.dart';
-import 'package:hive_flutter/adapters.dart';
-import 'package:logger/logger.dart';
 import 'package:smart_hospital/src/bloc/BlocObserver.dart';
 import 'package:smart_hospital/src/bloc/auth/auth_bloc.dart';
 import 'package:smart_hospital/src/bloc/auth_pin/auth_pin_bloc.dart';
 import 'package:smart_hospital/src/bloc/create_pin/create_pin_bloc.dart';
-import 'package:smart_hospital/src/pages/home/home_page.dart';
-import 'package:smart_hospital/src/pages/login/login_page.dart';
 import 'package:smart_hospital/src/pages/my_app.dart';
-import 'package:smart_hospital/src/services/notification_service.dart';
 import 'package:smart_hospital/src/services/push_notification_service.dart';
-import 'package:smart_hospital/src/utils/app_theme.dart';
-import 'package:smart_hospital/src/utils/constants.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'firebase_options.dart';
@@ -30,6 +21,15 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    print('Got a message whilst in the foreground!');
+    print('Message data: ${message.data}');
+
+    if (message.notification != null) {
+      print('Message also contained a notification: ${message.notification}');
+    }
+  });
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 

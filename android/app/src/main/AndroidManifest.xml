@@ -13,7 +13,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
    <application
-        android:label="smart_hospital"
+        android:label="Smart Hospital"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:smart_hospital/src/model/home/queue_model.dart';
 import 'package:smart_hospital/src/model/home/queue_of_front_model.dart';
+import 'package:smart_hospital/src/model/response_model.dart';
 import 'package:smart_hospital/src/services/preferences_service.dart';
 import 'package:smart_hospital/src/services/urls.dart';
 import 'package:smart_hospital/src/utils/date_time_format.dart';
@@ -189,6 +190,41 @@ class QueueService {
       final _jsonResponse = json.decode(_response.body);
 
       _data = QueueOfFrontModel.fromJson(_jsonResponse);
+
+      return _data;
+    } catch (err) {
+      logger.e(err.toString());
+      return _data;
+    }
+  }
+
+  Future<ResponseModel> updateHnCode({
+    required String hnCode,
+  }) async {
+    ResponseModel _data = ResponseModel();
+
+    try {
+      final _token = await prefService.getToken();
+
+      final _header = {
+        HttpHeaders.authorizationHeader: '$_token',
+      };
+
+      final _url = Uri.parse('${AppUrl.updateHnCode}/${hnCode}');
+
+      final _response = await http.get(
+        _url,
+        headers: _header,
+      );
+      logger.w(_response.statusCode);
+
+      if (_response.statusCode == 401) {
+        throw AuthenticationUnauthorized();
+      }
+
+      final _jsonResponse = json.decode(_response.body);
+
+      _data = ResponseModel.fromJson(_jsonResponse);
 
       return _data;
     } catch (err) {

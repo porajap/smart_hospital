@@ -1,5 +1,5 @@
 class AppUrl{
-  static final String devUrl = "http://192.168.1.115:4002/app/api";
+  static final String devUrl = "http://192.168.1.110:4002/app/api";
   static final String productionUrl = "https://re-loader.com/api_smarthospital/app/api";
 
   static final String baseUrl = devUrl;
@@ -13,6 +13,7 @@ class AppUrl{
   static final String queueToday = "$baseUrl/queue-of-user";
   static final String confirmQueue = "$baseUrl/confirm-queue";
   static final String queueOfFront = "$baseUrl/queue-of-front";
+  static final String updateHnCode = "$baseUrl/update-hn";
 
   static final String dataOfYear = "$baseUrl/data-of-year";
   static final String dataOfDay= "$baseUrl/data-of-day";
