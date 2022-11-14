@@ -441,7 +441,7 @@ class _HomePageState extends State<HomePage> {
 
     queueData = await queueService.queueOfUserToday();
 
-    if (queueData.data?.userDetail?.hnCode == "" || queueData.data?.userDetail?.hnCode == null) {
+    if (queueData.data != null && (queueData.data?.userDetail?.hnCode == "" || queueData.data?.userDetail?.hnCode == null)) {
       dialogEditHnCode();
     }
 
