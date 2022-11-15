@@ -441,8 +441,11 @@ class _HomePageState extends State<HomePage> {
 
     queueData = await queueService.queueOfUserToday();
 
+    BotToast.closeAllLoading();
+
     if (queueData.data != null && (queueData.data?.userDetail?.hnCode == "" || queueData.data?.userDetail?.hnCode == null)) {
       dialogEditHnCode();
+      return;
     }
 
     setState(() {});
@@ -451,7 +454,6 @@ class _HomePageState extends State<HomePage> {
     if (!_error) {
       timerQueueOfFront();
     }
-    BotToast.closeAllLoading();
   }
 
   Future<void> timerQueueOfFront() async {

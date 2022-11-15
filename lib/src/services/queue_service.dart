@@ -144,8 +144,6 @@ class QueueService {
 
       _data = QueueModel.fromJson(_jsonResponse);
 
-      logger.w(_data.toJson());
-
       return _data;
     } catch (err) {
       logger.e(err.toString());
