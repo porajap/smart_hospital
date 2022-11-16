@@ -16,6 +16,37 @@ import 'custom_exception.dart';
 class QueueService {
   final prefService = SharedPreferencesService();
 
+  Future<QueueModel> scanQr({required String queueNo}) async {
+    QueueModel _data = QueueModel();
+
+    try {
+      final _token = await prefService.getToken();
+
+      final _header = {
+        HttpHeaders.authorizationHeader: '$_token',
+      };
+
+      final _url = Uri.parse('${AppUrl.scanQr}/${queueNo}');
+
+      final _response = await http.get(_url, headers: _header);
+
+      if (_response.statusCode == 401) {
+        throw AuthenticationUnauthorized();
+      }
+
+      final _jsonResponse = json.decode(_response.body);
+
+      _data = QueueModel.fromJson(_jsonResponse);
+
+      logger.w(_data.toJson());
+
+      return _data;
+    } catch (err) {
+      logger.e(err);
+      return _data;
+    }
+  }
+
   Future<QueueModel> queueOfUserToday() async {
     QueueModel _data = QueueModel();
 
@@ -41,68 +72,6 @@ class QueueService {
       return _data;
     } catch (err) {
       logger.e(err);
-      return _data;
-    }
-  }
-
-  Future<QueueModel> booking() async {
-    QueueModel _data = QueueModel();
-
-    try {
-      final _token = await prefService.getToken();
-
-      final _header = {
-        HttpHeaders.authorizationHeader: '$_token',
-      };
-
-      final _url = Uri.parse('${AppUrl.booking}');
-
-      final _response = await http.post(_url, headers: _header);
-
-      if (_response.statusCode == 401) {
-        throw AuthenticationUnauthorized();
-      }
-
-      final _jsonResponse = json.decode(_response.body);
-
-      _data = QueueModel.fromJson(_jsonResponse);
-
-      logger.w(_data.toJson());
-
-      return _data;
-    } catch (err) {
-      logger.e(err);
-      return _data;
-    }
-  }
-
-  Future<QueueModel> getQueueByNo({required String queueNo}) async {
-    QueueModel _data = QueueModel();
-
-    try {
-      final _token = await prefService.getToken();
-
-      final _header = {
-        HttpHeaders.authorizationHeader: '$_token',
-      };
-
-      final _url = Uri.parse('${AppUrl.queueByNo}/${queueNo}');
-
-      final _response = await http.get(_url, headers: _header);
-
-      if (_response.statusCode == 401) {
-        throw AuthenticationUnauthorized();
-      }
-
-      final _jsonResponse = json.decode(_response.body);
-
-
-      _data = QueueModel.fromJson(_jsonResponse);
-
-
-      return _data;
-    } catch (err) {
-      logger.e(err.toString());
       return _data;
     }
   }

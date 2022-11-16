@@ -92,6 +92,7 @@ class AuthService {
       if(!_error){
         await prefService.setIsLoggedIn(isLogin: true);
         await prefService.setUserLoggedIn(data: _data);
+        FirebaseMessaging.instance.getToken().then(setTokenFCM);
       }
 
       return _data;

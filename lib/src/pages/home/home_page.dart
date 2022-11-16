@@ -21,6 +21,7 @@ import 'package:smart_hospital/src/utils/my_dialog.dart';
 import 'package:smart_hospital/src/utils/my_widget.dart';
 
 import '../../../main.dart';
+import '../../services/push_notification_service.dart';
 import '../../utils/app_bar.dart';
 import '../../utils/constants.dart';
 import '../my_app.dart';
@@ -53,8 +54,22 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     queueToday();
+    setupFCM();
     // _getCurrentPosition();
     super.initState();
+  }
+
+  void setupFCM() async{
+    PushNotificationService pushNotificationService = PushNotificationService();
+
+    await pushNotificationService.setupFlutterNotifications();
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      pushNotificationService.showFlutterNotification(message);
+      if(message.notification != null){
+        queueToday();
+      }
+    });
   }
 
   @override
@@ -67,7 +82,7 @@ class _HomePageState extends State<HomePage> {
   Future openScanPage() async {
     Navigator.of(context).push(MaterialPageRoute(builder: (context) => ScanPage())).then((value) {
       if (value != null) {
-        getQueueNo();
+        scanQrCode(queueNo: value);
       }
     });
   }
@@ -83,6 +98,7 @@ class _HomePageState extends State<HomePage> {
             MyDialog.dialogConfirm(
               context: context,
               callback: () {
+                timer?.cancel();
                 context.read<AuthBloc>().add(AuthEventLoggedOut());
               },
               title: "ออกจากระบบ",
@@ -361,91 +377,11 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildDetailWhenConfirm() => Container(
-        width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.symmetric(vertical: 15),
-        child: Column(
-          children: [
-            Text(
-              "${queueData.data?.roomName ?? ""}",
-              style: TextStyle(
-                color: AppColor.primaryColor,
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            buildQueueDetail(),
-            Divider(height: 1),
-            SizedBox(height: 15),
-            Column(
-              children: [
-                Text(
-                  "ชื่อผู้ป่วย",
-                  style: Theme.of(context).textTheme.subtitle2,
-                ),
-                SizedBox(height: 5),
-                Text(
-                  "-- --",
-                  style: TextStyle(
-                    color: AppColor.textPrimaryColor,
-                    fontSize: 18,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 15),
-            Column(
-              children: [
-                Text(
-                  "HN สิทธิ์",
-                  style: Theme.of(context).textTheme.subtitle2,
-                ),
-                SizedBox(height: 5),
-                Text(
-                  "-- -",
-                  style: TextStyle(
-                    color: AppColor.textPrimaryColor,
-                    fontSize: 18,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 15),
-            Divider(),
-            SizedBox(height: 15),
-            Column(
-              children: [
-                Text(
-                  "ไม่มีนัด",
-                  style: Theme.of(context).textTheme.subtitle2,
-                ),
-                SizedBox(height: 5),
-                Text(
-                  "ต้องการพบแพทย์",
-                  style: TextStyle(
-                    color: AppColor.textPrimaryColor,
-                    fontSize: 20,
-                    decoration: TextDecoration.underline,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 30),
-            Text("(กรุณาแสดงหน้าจอให้เจ้าหน้าที่)")
-          ],
-        ),
-      );
-
   Future<void> queueToday() async {
-    BotToast.showLoading();
-
     queueData = await queueService.queueOfUserToday();
-
-    BotToast.closeAllLoading();
 
     if (queueData.data != null && (queueData.data?.userDetail?.hnCode == "" || queueData.data?.userDetail?.hnCode == null)) {
       dialogEditHnCode();
-      return;
     }
 
     setState(() {});
@@ -456,42 +392,29 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> timerQueueOfFront() async {
-    timer = Timer.periodic(Duration(seconds: 10), (Timer t) => queueOfFront());
+  Future<void> queueDetailCurrent() async {
+    queueData = await queueService.queueOfUserToday();
+    setState(() {});
   }
 
-  Future<void> scanQrCode() async {
+  Future<void> timerQueueOfFront() async {
+    timer = Timer.periodic(Duration(seconds: 5), (Timer t) => queueDetailCurrent());
+  }
+
+  Future<void> scanQrCode({required String queueNo}) async {
     BotToast.showLoading();
 
-    queueData = await queueService.booking();
+    queueData = await queueService.scanQr(queueNo: queueNo.trim());
     setState(() {});
 
     bool _error = queueData.error ?? false;
 
     if (_error) {
-      queueToday();
+      timerQueueOfFront();
       return;
     }
-    timerQueueOfFront();
+    queueToday();
     BotToast.closeAllLoading();
-  }
-
-  Future<void> getQueueNo() async {
-    BotToast.showLoading();
-
-    queueData = await queueService.getQueueByNo(queueNo: qrCodeResult?.code ?? "");
-
-    bool _error = queueData.error ?? false;
-
-    if (_error) {
-      queueToday();
-      return;
-    }
-    timerQueueOfFront();
-
-    setState(() {
-      BotToast.closeAllLoading();
-    });
   }
 
   Future<void> confirmQueue() async {
@@ -504,7 +427,7 @@ class _HomePageState extends State<HomePage> {
     queueData = await queueService.confirmQueue(queueId: _queueId, queueNo: _queueNo, roomId: _roomId);
     bool _error = queueData.error ?? false;
     if (!_error) {
-      timerQueueOfFront();
+      queueToday();
     }
     setState(() {
       BotToast.closeAllLoading();
@@ -518,6 +441,7 @@ class _HomePageState extends State<HomePage> {
     queueOfFrontData = await queueService.queueOfFront(queueNo: _queueNo, queueOfRoom: _queueOfRoom as int);
 
     setState(() {});
+
   }
 
   Future<void> _getCurrentPosition() async {
