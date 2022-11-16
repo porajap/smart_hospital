@@ -394,6 +394,9 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> queueDetailCurrent() async {
     queueData = await queueService.queueOfUserToday();
+    if (!mounted) {
+      return;
+    }
     setState(() {});
   }
 
