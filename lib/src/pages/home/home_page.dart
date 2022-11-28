@@ -25,6 +25,7 @@ import '../../services/push_notification_service.dart';
 import '../../utils/app_bar.dart';
 import '../../utils/constants.dart';
 import '../my_app.dart';
+import 'components/app_bar.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -55,18 +56,17 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     queueToday();
     setupFCM();
-    // _getCurrentPosition();
     super.initState();
   }
 
-  void setupFCM() async{
+  void setupFCM() async {
     PushNotificationService pushNotificationService = PushNotificationService();
 
     await pushNotificationService.setupFlutterNotifications();
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       pushNotificationService.showFlutterNotification(message);
-      if(message.notification != null){
+      if (message.notification != null) {
         queueToday();
       }
     });
@@ -90,22 +90,11 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MyAppBar(
-        context: context,
-        title: "Smart Hospital",
-        action: AppBarAction(
-          onPressed: () {
-            MyDialog.dialogConfirm(
-              context: context,
-              callback: () {
-                timer?.cancel();
-                context.read<AuthBloc>().add(AuthEventLoggedOut());
-              },
-              title: "ออกจากระบบ",
-              msg: 'คุณต้องการออกจากระบบใช่หรือไม่?',
-            );
-          },
-          icon: Icon(Icons.logout),
+      appBar: PreferredSize(
+        preferredSize: Size(MediaQuery.of(context).size.width, 80),
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 10),
+          child: HomeAppBar(),
         ),
       ),
       body: Container(
@@ -125,42 +114,26 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: openScanPage,
-        tooltip: "สแกนคิวอาร์โค้ด",
-        child: Icon(Icons.qr_code_scanner_rounded),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: BottomAppBar(
-        color: AppColor.primaryColor,
-        shape: CircularNotchedRectangle(),
-        notchMargin: 5,
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                splashRadius: 20,
-                icon: Icon(Icons.home),
-                onPressed: () {},
+      bottomNavigationBar: queueData.data != null
+          ? SizedBox()
+          : BottomAppBar(
+              elevation: 0,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: ElevatedButton.icon(
+                  onPressed: openScanPage,
+                  label: Text("สแกนคิวอาร์โค้ด"),
+                  icon: Icon(Icons.qr_code_scanner_rounded),
+                ),
               ),
-              IconButton(
-                splashRadius: 20,
-                icon: Icon(Icons.bookmark_add),
-                onPressed: () {},
-              ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 
   Widget buildUserData() {
     var _userData = queueData.data?.userDetail;
     var _queueData = queueData.data;
+    var _queueNo = queueData.data?.queueNo;
 
     String _hnCode = _userData?.hnCode ?? "";
     String _fName = _userData?.fNameTh ?? "";
@@ -178,67 +151,38 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("หมายเลข HN", style: TextStyle(fontSize: 12)),
-                  Text("$_hnCode",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColor.textPrimaryColor,
-                        fontWeight: FontWeight.bold,
-                      )),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text("วันที่/เวลา ที่มาถึง รพ.", style: TextStyle(fontSize: 12)),
-                  Text("$_date $_time",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColor.textPrimaryColor,
-                        fontWeight: FontWeight.bold,
-                      )),
-                ],
-              ),
-            ],
-          ),
-          SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("ชื่อ - นามสกุล", style: TextStyle(fontSize: 12)),
-                  Text("$_fullName",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColor.textPrimaryColor,
-                        fontWeight: FontWeight.bold,
-                      )),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text("ประเภทผู้ป่วย", style: TextStyle(fontSize: 12)),
-                  Text("$_userType",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColor.textPrimaryColor,
-                        fontWeight: FontWeight.bold,
-                      )),
-                ],
-              ),
+              dataDetail(title: "ชื่อ - นามสกุล", detail: _fullName),
+              Container(padding: EdgeInsets.symmetric(vertical: 10), child: Divider()),
+              dataDetail(title: "รหัสผู้ป่วย", detail: "$_queueNo"),
+              Container(padding: EdgeInsets.symmetric(vertical: 10), child: Divider()),
+              dataDetail(title: "หมายเลข HN", detail: "$_hnCode", detailColor: AppColor.primaryColor),
+              Container(padding: EdgeInsets.symmetric(vertical: 10), child: Divider()),
+              dataDetail(title: "ประเภทผู้ป่วย", detail: "$_userType"),
+              Container(padding: EdgeInsets.symmetric(vertical: 10), child: Divider()),
+              dataDetail(title: "วันที่เข้ารับการรักษา", detail: "$_date $_time"),
             ],
           ),
         ],
       ),
+    );
+  }
+
+  Widget dataDetail({required String title, required String detail, Color? detailColor}) {
+
+    detailColor = detailColor ?? AppColor.textPrimaryColor;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text("$title"),
+        Text(
+          "$detail",
+          style: TextStyle(color: detailColor, fontWeight: FontWeight.bold),
+        ),
+      ],
     );
   }
 
@@ -250,15 +194,12 @@ class _HomePageState extends State<HomePage> {
         padding: EdgeInsets.only(bottom: 40),
         child: Column(
           children: [
-            Card(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  buildUserData(),
-                  Divider(),
-                  buildQueueDetail(),
-                ],
-              ),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                buildQueueDetail(),
+                buildUserData(),
+              ],
             ),
             SizedBox(height: 5),
             Visibility(
@@ -384,6 +325,8 @@ class _HomePageState extends State<HomePage> {
       dialogEditHnCode();
     }
 
+    logger.w(queueData.toJson());
+
     setState(() {});
 
     bool _error = queueData.error ?? false;
@@ -444,7 +387,6 @@ class _HomePageState extends State<HomePage> {
     queueOfFrontData = await queueService.queueOfFront(queueNo: _queueNo, queueOfRoom: _queueOfRoom as int);
 
     setState(() {});
-
   }
 
   Future<void> _getCurrentPosition() async {

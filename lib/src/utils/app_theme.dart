@@ -13,8 +13,8 @@ class AppTheme {
       error: AppColor.errorColor,
     ),
     iconTheme: IconThemeData(color: AppColor.iconColor),
-    backgroundColor: AppColor.bgColor,
-    scaffoldBackgroundColor: AppColor.bgColor,
+    backgroundColor: AppColor.whiteColor,
+    scaffoldBackgroundColor: AppColor.whiteColor,
     textTheme: TextTheme(
       headline1: TextStyle(fontSize: 16, color: AppColor.textPrimaryColor, fontFamily: AppColor.appFontRegular),
       bodyText1: TextStyle(fontSize: 14, color: AppColor.textPrimaryColor, fontFamily: AppColor.appFontLight),
@@ -24,16 +24,16 @@ class AppTheme {
     ),
     appBarTheme: AppBarTheme(
       elevation: 0,
-      centerTitle: true,
-      backgroundColor: AppColor.bgColor,
+      centerTitle: false,
+      backgroundColor: AppColor.primaryColor,
       systemOverlayStyle: SystemUiOverlayStyle(
-        statusBarColor: AppColor.bgColor,
-        statusBarIconBrightness: Brightness.dark,
+        statusBarColor: AppColor.primaryColor,
+        statusBarIconBrightness: Brightness.light,
       ),
-      iconTheme: IconThemeData(color: AppColor.textPrimaryColor),
+      iconTheme: IconThemeData(color: AppColor.whiteColor),
       titleTextStyle: TextStyle(
         fontSize: 18,
-        color: AppColor.textPrimaryColor,
+        color: AppColor.whiteColor,
         fontFamily: AppColor.appFontRegular,
       ),
       actionsIconTheme: IconThemeData(
