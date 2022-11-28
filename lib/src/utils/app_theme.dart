@@ -152,8 +152,8 @@ class AppColor {
 
   static MaterialColor primarySwatch = MaterialColor(0xFF0040C1, AppColor.colorSwatch);
 
-  static var appFontLight = GoogleFonts.mitr(fontWeight: FontWeight.w300).fontFamily;
-  static var appFontRegular = GoogleFonts.mitr(fontWeight: FontWeight.w400).fontFamily;
+  static var appFontLight = GoogleFonts.prompt(fontWeight: FontWeight.w300).fontFamily;
+  static var appFontRegular = GoogleFonts.prompt(fontWeight: FontWeight.w400).fontFamily;
 
   static Color iconColor = Colors.white;
   static Color primaryColor = Color(0xFF0040C1);
