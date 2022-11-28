@@ -184,6 +184,7 @@ class _HomePageState extends State<HomePage> {
               dataDetail(title: "ประเภทผู้ป่วย", detail: "$_userType"),
               Container(padding: EdgeInsets.symmetric(vertical: 10), child: Divider()),
               dataDetail(title: "วันที่เข้ารับการรักษา", detail: "$_date $_time"),
+              Container(padding: EdgeInsets.symmetric(vertical: 10), child: Divider()),
             ],
           ),
         ],
