@@ -147,16 +147,16 @@ class AppColor {
     600: Color(0xFF6e9eff),
     700: Color(0xFF5a91ff),
     800: Color(0xFF4784ff),
-    900: Color(0xFF3377FF),
+    900: Color(0xFF0040C1),
   };
 
-  static MaterialColor primarySwatch = MaterialColor(0xFF3377FF, AppColor.colorSwatch);
+  static MaterialColor primarySwatch = MaterialColor(0xFF0040C1, AppColor.colorSwatch);
 
   static var appFontLight = GoogleFonts.mitr(fontWeight: FontWeight.w300).fontFamily;
   static var appFontRegular = GoogleFonts.mitr(fontWeight: FontWeight.w400).fontFamily;
 
   static Color iconColor = Colors.white;
-  static Color primaryColor = Color(0xFF3377FF);
+  static Color primaryColor = Color(0xFF0040C1);
   static Color secondaryColor = Color(0x33007BFF);
   static Color errorColor = Color(0xFFFB4E4E);
   static Color successColor = Color(0xFF7AC796);
