@@ -92,7 +92,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size(MediaQuery.of(context).size.width, 50),
+        preferredSize: Size(MediaQuery.of(context).size.width, 60),
         child: Container(
           // padding: EdgeInsets.symmetric(vertical: 10),
           child: HomeAppBar(),
