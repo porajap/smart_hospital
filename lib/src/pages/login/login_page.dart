@@ -28,31 +28,21 @@ class _LoginPageState extends State<LoginPage> {
           preferredSize: Size(0, 0),
           child: AppBar(
             systemOverlayStyle: SystemUiOverlayStyle(
-              statusBarColor: AppColor.primaryColor,
-              statusBarIconBrightness: Brightness.light,
+              statusBarColor: AppColor.whiteColor,
+              statusBarIconBrightness: Brightness.dark,
             ),
           ),
         ),
         resizeToAvoidBottomInset: true,
         extendBodyBehindAppBar: true,
-        body: Center(
-          child: SafeArea(
-            child: SingleChildScrollView(
-              child: LoginForm(),
-            ),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: LoginForm(),
           ),
         ),
-        bottomNavigationBar: BottomAppBar(
-          color: AppColor.bgColor,
-          elevation: 0,
-          child: Padding(
-            padding: EdgeInsets.only(bottom: 15),
-            child: Text(
-              "${Constants.createBy}",
-              style: TextStyle(color: AppColor.textSecondaryColor, fontSize: 12),
-              textAlign: TextAlign.center,
-            ),
-          ),
+        bottomNavigationBar: Container(
+          color: AppColor.whiteColor,
+          child: Image.asset("${Constants.imageUrl}/login_bg.png"),
         ),
       ),
     );

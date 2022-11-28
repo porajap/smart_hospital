@@ -43,30 +43,32 @@ class _LoginFormState extends State<LoginForm> {
         key: _formKey,
         child: Column(
           children: [
+            SizedBox(height: 50),
             Container(
-              width: 200,
-              height: 200,
-              child: Placeholder(),
+              child: Image.asset("${Constants.imageUrl}/logo.png", width: 180,),
             ),
             SizedBox(height: 50),
-            TextFormField(
-              controller: _phoneController,
-              maxLength: 10,
-              maxLines: 1,
-              keyboardType: TextInputType.phone,
-              decoration: InputDecoration(
-                labelText: "${Constants.loginPhoneLabel}",
-                suffixIcon: SizedBox(),
-              ),
-              validator: (value) {
-                if (value == null || value.trim().length == 0) {
-                  return 'กรุณากรอกเบอร์มือถือ 10 หลัก';
-                }
+            Column(
+              children: [
+                Text("กรอกเบอร์โทรศัพท์ของคุณ", style: TextStyle(color: AppColor.textPrimaryColor, fontWeight: FontWeight.bold),),
+                SizedBox(height: 10),
+                TextFormField(
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
+                  decoration: InputDecoration(
+                    suffixIcon: SizedBox(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.trim().length == 0) {
+                      return 'กรุณากรอกเบอร์มือถือ 10 หลัก';
+                    }
 
-                return null;
-              },
+                    return null;
+                  },
+                ),
+              ],
             ),
-            SizedBox(height: 30),
+            SizedBox(height: 10),
             buildButton(),
           ],
         ),
@@ -79,7 +81,7 @@ class _LoginFormState extends State<LoginForm> {
         child: ElevatedButton(
           onPressed: !isEnabledButton ? null : login,
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
+            padding: EdgeInsets.symmetric(vertical: 8),
             child: Text("${Constants.loginSignIn}"),
           ),
         ),

@@ -2,6 +2,8 @@ class Constants{
   static String appName = 'Smart Hospital';
   static String createBy = "Copyright © 2022";
 
+  static String imageUrl = 'lib/src/assets/images';
+
   //other
   static String textMenu = 'เมนู';
   static String textCancel = 'ยกเลิก';

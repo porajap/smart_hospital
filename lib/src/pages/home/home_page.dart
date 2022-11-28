@@ -105,9 +105,15 @@ class _HomePageState extends State<HomePage> {
             height: MediaQuery.of(context).size.height,
             child: queueData.data == null
                 ? Center(
-                    child: Text(
-                      "สแกนคิวอาร์โค้ดเพื่อดูรายละเอียด",
-                      style: Theme.of(context).textTheme.headline1,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Image.asset("${Constants.imageUrl}/home_qr.png", width: 180),
+                        SizedBox(height: 20),
+                        Text("ไม่พบข้อมูล", style: Theme.of(context).textTheme.headline1),
+                        SizedBox(height: 5),
+                        Text("สแกนคิวอาร์โค้ดเพื่อดูรายละเอียด"),
+                      ],
                     ),
                   )
                 : buildDetail(),
@@ -171,7 +177,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget dataDetail({required String title, required String detail, Color? detailColor}) {
-
     detailColor = detailColor ?? AppColor.textPrimaryColor;
 
     return Row(
