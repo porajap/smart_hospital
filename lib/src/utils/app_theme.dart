@@ -159,7 +159,7 @@ class AppColor {
   static Color primaryColor = Color(0xFF3377FF);
   static Color secondaryColor = Color(0x33007BFF);
   static Color errorColor = Color(0xFFFB4E4E);
-  static Color successColor = Color(0xFF2AC769);
+  static Color successColor = Color(0xFF7AC796);
 
   static Color textPrimaryColor = Color(0xFF222B48);
   static Color textSecondaryColor = Color(0xFF7788A7);

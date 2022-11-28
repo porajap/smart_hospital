@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:hive/hive.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:smart_hospital/src/bloc/auth/auth_bloc.dart';
 import 'package:smart_hospital/src/model/home/queue_detail_model.dart';
@@ -91,33 +92,47 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size(MediaQuery.of(context).size.width, 80),
+        preferredSize: Size(MediaQuery.of(context).size.width, 50),
         child: Container(
-          padding: EdgeInsets.symmetric(vertical: 10),
+          // padding: EdgeInsets.symmetric(vertical: 10),
           child: HomeAppBar(),
         ),
       ),
       body: Container(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
-        child: MyScreen(
-          child: Container(
-            height: MediaQuery.of(context).size.height,
-            child: queueData.data == null
-                ? Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Image.asset("${Constants.imageUrl}/home_qr.png", width: 180),
-                        SizedBox(height: 20),
-                        Text("ไม่พบข้อมูล", style: Theme.of(context).textTheme.headline1),
-                        SizedBox(height: 5),
-                        Text("สแกนคิวอาร์โค้ดเพื่อดูรายละเอียด"),
-                      ],
-                    ),
+        child: Stack(
+          children: [
+            queueData.data == null ? SizedBox() : Container(
+              height: 100,
+              decoration: BoxDecoration(
+                  color: AppColor.primaryColor,
+                  borderRadius: BorderRadius.only(
+                    bottomRight: Radius.circular(50),
+                    bottomLeft: Radius.circular(70),
                   )
-                : buildDetail(),
-          ),
+              ),
+            ),
+            MyScreen(
+              child: Container(
+                height: MediaQuery.of(context).size.height,
+                child: queueData.data == null
+                    ? Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Image.asset("${Constants.imageUrl}/home_qr.png", width: 180),
+                            SizedBox(height: 20),
+                            Text("ไม่พบข้อมูล", style: Theme.of(context).textTheme.headline1),
+                            SizedBox(height: 5),
+                            Text("สแกนคิวอาร์โค้ดเพื่อดูรายละเอียด"),
+                          ],
+                        ),
+                      )
+                    : buildDetail(),
+              ),
+            ),
+          ],
         ),
       ),
       bottomNavigationBar: queueData.data != null
@@ -125,7 +140,7 @@ class _HomePageState extends State<HomePage> {
           : BottomAppBar(
               elevation: 0,
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 20),
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 child: ElevatedButton.icon(
                   onPressed: openScanPage,
                   label: Text("สแกนคิวอาร์โค้ด"),
@@ -196,7 +211,6 @@ class _HomePageState extends State<HomePage> {
 
     return SingleChildScrollView(
       child: Container(
-        padding: EdgeInsets.only(bottom: 40),
         child: Column(
           children: [
             Column(
@@ -237,89 +251,72 @@ class _HomePageState extends State<HomePage> {
     String _queueOfRoom = _queueDetail?.queueOfRoom != null ? '${_queueDetail?.queueOfRoom as int}' : '-';
     String _queueOfFront = '$_queueFront';
 
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-      child: Column(
-        children: [
-          Column(
+    return Stack(
+      children: [
+        Image.asset(
+          "${Constants.imageUrl}/home_q.png",
+          width: double.maxFinite,
+        ),
+        Container(
+          width: MediaQuery.of(context).size.width,
+          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+          child: Column(
             children: [
-              Column(
+              Text(
+                "${_roomName}",
+                style: TextStyle(
+                  color: AppColor.whiteColor,
+                  fontSize: 24,
+                ),
+              ),
+              SizedBox(height: 25),
+              Row(
                 children: [
-                  Text(
-                    "หมายเลขคิวของคุุณ",
-                    style: Theme.of(context).textTheme.headline1,
+                  Expanded(
+                    child: Container(
+                      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: AppColor.successColor),
+                      child: Column(
+                        children: [
+                          Text(
+                            "$_queueOfRoom",
+                            style: TextStyle(color: AppColor.whiteColor, fontSize: 32),
+                          ),
+                          SizedBox(height: 20),
+                          Text(
+                            "คิวของคุณ",
+                            style: TextStyle(color: AppColor.whiteColor, fontSize: 16),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  Text(
-                    "(${_roomName})",
-                    style: TextStyle(
-                      color: AppColor.textPrimaryColor,
-                      fontSize: 14,
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: Container(
+                      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: AppColor.successColor),
+                      child: Column(
+                        children: [
+                          Text(
+                            "$_queueOfFront",
+                            style: TextStyle(color: AppColor.whiteColor, fontSize: 32),
+                          ),
+                          SizedBox(height: 20),
+                          Text(
+                            "มีคิวก่อนหน้า",
+                            style: TextStyle(color: AppColor.whiteColor, fontSize: 16),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 5),
-              Text(
-                "${_queueNo}",
-                style: TextStyle(
-                  color: AppColor.primaryColor,
-                  fontSize: 36,
-                ),
-              ),
             ],
           ),
-          SizedBox(height: 10),
-          Divider(),
-          SizedBox(height: 10),
-          IntrinsicHeight(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      "คิวของห้อง",
-                      style: Theme.of(context).textTheme.subtitle2,
-                    ),
-                    SizedBox(height: 5),
-                    Text(
-                      "$_queueOfRoom",
-                      style: TextStyle(
-                        color: AppColor.primaryColor.withOpacity(0.5),
-                        fontSize: 30,
-                      ),
-                    ),
-                  ],
-                ),
-                VerticalDivider(
-                  thickness: 1,
-                  color: AppColor.grayColor,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      "คิวก่อนหน้า",
-                      style: Theme.of(context).textTheme.subtitle2,
-                    ),
-                    SizedBox(height: 5),
-                    Text(
-                      "$_queueOfFront",
-                      style: TextStyle(
-                        color: AppColor.primaryColor.withOpacity(0.5),
-                        fontSize: 30,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 15),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
