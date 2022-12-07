@@ -72,15 +72,6 @@ class _HomeAppBarState extends State<HomeAppBar> {
   List<PopupMenuEntry<String>> buildPopupMenuItems() {
     List<PopupMenuEntry<String>> popupMenuItem = [
       PopupMenuItem<String>(
-        value: "SETTING",
-        child: buildMenuItem(
-          title: "ตั้งค่า",
-          icon: Icons.settings_outlined,
-          color: AppColor.textPrimaryColor,
-        ),
-      ),
-      PopupMenuDivider(),
-      PopupMenuItem<String>(
         value: "LOGOUT",
         child: buildMenuItem(
           title: "ออกจากระบบ",

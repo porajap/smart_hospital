@@ -44,10 +44,12 @@ dev_dependencies:
 flutter_launcher_name:
   name: "Smart Hospital"
 
-
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "lib/src/assets/images/logo.png"
 
 flutter:
-
 
   uses-material-design: true
 
