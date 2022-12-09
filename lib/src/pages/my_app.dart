@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';
 import 'package:smart_hospital/src/bloc/auth_pin/auth_pin_bloc.dart';
-import 'package:smart_hospital/src/pages/dashboard/dashboard.dart';
 
 import '../bloc/auth/auth_bloc.dart';
 import '../services/navigation_service.dart';
@@ -113,9 +112,6 @@ class _MyAppState extends State<MyApp> {
             }
 
             if (state is AuthStateAuthenticated) {
-              if (state.role == 1) {
-                return Dashboard();
-              }
               return HomePage();
             }
 

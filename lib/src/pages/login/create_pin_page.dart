@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:smart_hospital/src/pages/dashboard/dashboard.dart';
 import 'package:smart_hospital/src/pages/home/home_page.dart';
 import 'package:smart_hospital/src/utils/app_theme.dart';
 import 'package:smart_hospital/src/utils/my_dialog.dart';
@@ -34,23 +33,13 @@ class _CreatePINState extends State<CreatePIN> {
             MyDialog.dialogCustom(
               context: context,
               callback: () {
-                if (state.loggedInData?.data?.role == 1) {
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (_) => Dashboard(),
-                    ),
-                    (_) => false,
-                  );
-                }else{
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (_) => HomePage(),
-                    ),
-                        (_) => false,
-                  );
-                }
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => HomePage(),
+                  ),
+                      (_) => false,
+                );
               },
               title: pinCreated,
               msg: '',
