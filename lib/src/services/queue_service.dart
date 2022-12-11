@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:smart_hospital/src/model/home/queue_model.dart';
 import 'package:smart_hospital/src/model/home/queue_of_front_model.dart';
+import 'package:smart_hospital/src/model/location/room_location_model.dart';
 import 'package:smart_hospital/src/model/response_model.dart';
 import 'package:smart_hospital/src/services/preferences_service.dart';
 import 'package:smart_hospital/src/services/urls.dart';
@@ -199,4 +200,34 @@ class QueueService {
       return _data;
     }
   }
+
+  Future<RoomLocationModel> getLocationOfRoom({required int roomId}) async {
+    RoomLocationModel _data = RoomLocationModel();
+
+    try {
+      final _token = await prefService.getToken();
+
+      final _header = {
+        HttpHeaders.authorizationHeader: '$_token',
+      };
+
+      final _url = Uri.parse('${AppUrl.locationOfRoom}/${roomId}');
+
+      final _response = await http.get(_url, headers: _header);
+
+      if (_response.statusCode == 401) {
+        throw AuthenticationUnauthorized();
+      }
+
+      final _jsonResponse = json.decode(_response.body);
+
+      _data = RoomLocationModel.fromJson(_jsonResponse);
+
+      return _data;
+    } catch (err) {
+      logger.e(err);
+      return _data;
+    }
+  }
+
 }

@@ -26,4 +26,7 @@ class AppUrl{
   static final String booking = "$baseUrl/booking";
 
   static final String addToken = "$baseUrl/add-token";
+
+  //location room
+  static final String locationOfRoom = "$baseUrl/room-location";
 }

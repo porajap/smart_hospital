@@ -14,6 +14,7 @@ import 'package:smart_hospital/src/model/home/queue_model.dart';
 import 'package:smart_hospital/src/model/home/queue_of_front_model.dart';
 import 'package:smart_hospital/src/pages/home/scan_page.dart';
 import 'package:smart_hospital/src/pages/login/login_page.dart';
+import 'package:smart_hospital/src/pages/room_map/map_page.dart';
 import 'package:smart_hospital/src/services/preferences_service.dart';
 import 'package:smart_hospital/src/services/queue_service.dart';
 import 'package:smart_hospital/src/utils/app_theme.dart';
@@ -43,11 +44,6 @@ class _HomePageState extends State<HomePage> {
 
   bool isLoading = false;
 
-  final GeolocatorPlatform _geoLocator = GeolocatorPlatform.instance;
-
-  double destination = 0;
-  double roomLatitude = 18.77021350974426;
-  double roomLongitude = 98.97541530144976;
 
   bool isConfirm = false;
   Barcode? qrCodeResult;
@@ -103,16 +99,17 @@ class _HomePageState extends State<HomePage> {
         width: MediaQuery.of(context).size.width,
         child: Stack(
           children: [
-            queueData.data == null ? SizedBox() : Container(
-              height: 100,
-              decoration: BoxDecoration(
-                  color: AppColor.primaryColor,
-                  borderRadius: BorderRadius.only(
-                    bottomRight: Radius.circular(50),
-                    bottomLeft: Radius.circular(70),
-                  )
-              ),
-            ),
+            queueData.data == null
+                ? SizedBox()
+                : Container(
+                    height: 100,
+                    decoration: BoxDecoration(
+                        color: AppColor.primaryColor,
+                        borderRadius: BorderRadius.only(
+                          bottomRight: Radius.circular(50),
+                          bottomLeft: Radius.circular(70),
+                        )),
+                  ),
             MyScreen(
               child: Container(
                 height: MediaQuery.of(context).size.height,
@@ -185,6 +182,21 @@ class _HomePageState extends State<HomePage> {
               Container(padding: EdgeInsets.symmetric(vertical: 10), child: Divider()),
               dataDetail(title: "วันที่เข้ารับการรักษา", detail: "$_date $_time"),
               Container(padding: EdgeInsets.symmetric(vertical: 10), child: Divider()),
+              Container(
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MapPage(
+                          roomId: queueData.data?.roomId,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Text("ตำแหน่งของห้อง"),
+                ),
+              ),
             ],
           ),
         ],
@@ -216,6 +228,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 buildQueueDetail(),
                 buildUserData(),
@@ -324,7 +337,8 @@ class _HomePageState extends State<HomePage> {
   Future<void> queueToday() async {
     queueData = await queueService.queueOfUserToday();
 
-    if (queueData.data != null && (queueData.data?.userDetail?.hnCode == "" || queueData.data?.userDetail?.hnCode == null)) {
+    if (queueData.data != null &&
+        (queueData.data?.userDetail?.hnCode == "" || queueData.data?.userDetail?.hnCode == null)) {
       dialogEditHnCode();
     }
 
@@ -392,74 +406,6 @@ class _HomePageState extends State<HomePage> {
     setState(() {});
   }
 
-  Future<void> _getCurrentPosition() async {
-    BotToast.showLoading();
-
-    final hasPermission = await _handlePermission();
-
-    if (!hasPermission) {
-      return;
-    }
-
-    final position = await _geoLocator.getCurrentPosition(
-      locationSettings: LocationSettings(
-        accuracy: LocationAccuracy.bestForNavigation,
-      ),
-    );
-
-    logger.i(position);
-
-    destination = await _geoLocator.distanceBetween(
-      position.latitude,
-      position.longitude,
-      roomLatitude,
-      roomLongitude,
-    );
-
-    logger.w("Destination ${destination.round()} M"); //to m.
-
-    List<Placemark> startPlaceMarks = await placemarkFromCoordinates(position.latitude, position.longitude);
-    Placemark startPlace = startPlaceMarks[0];
-    logger.w(startPlace);
-
-    List<Placemark> endPlaceMarks = await placemarkFromCoordinates(roomLatitude, roomLongitude);
-    Placemark endPlace = endPlaceMarks[0];
-    logger.w(endPlace);
-
-    BotToast.closeAllLoading();
-
-    // if (destination.round() > 20) {
-    //   MyDialog.dialogCustom(
-    //     context: context,
-    //     title: "ผิดพลาด",
-    //     msg: 'คุณอยู่ห่างจากห้องมากกว่า 20 ม. ไม่สามารถยืนยันคิวได้',
-    //     callback: () {},
-    //   );
-    // }
-  }
-
-  Future<bool> _handlePermission() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await _geoLocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return false;
-    }
-
-    permission = await _geoLocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await _geoLocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return false;
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      return false;
-    }
-    return true;
-  }
 
   var _hnFormKey = GlobalKey<FormState>();
   TextEditingController _hnController = TextEditingController(text: "");
