@@ -27,7 +27,7 @@ class LoginForm extends StatefulWidget {
 
 class _LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController _phoneController = new TextEditingController(text: "0123456789");
+  TextEditingController _phoneController = new TextEditingController(text: "");
   bool isEnabledButton = true;
 
   @override
@@ -57,9 +57,14 @@ class _LoginFormState extends State<LoginForm> {
                   keyboardType: TextInputType.phone,
                   decoration: InputDecoration(
                     suffixIcon: SizedBox(),
+                    hintText: "0123456780"
                   ),
                   validator: (value) {
                     if (value == null || value.trim().length == 0) {
+                      return 'กรุณากรอกเบอร์มือถือ';
+                    }
+
+                    if (value.length < 10) {
                       return 'กรุณากรอกเบอร์มือถือ 10 หลัก';
                     }
 
@@ -88,7 +93,9 @@ class _LoginFormState extends State<LoginForm> {
       );
 
   Future<void> login() async {
-    context.read<AuthBloc>().add(AuthEventCheckLogin(phone: _phoneController.text.trim()));
+    if(_formKey.currentState!.validate()){
+      context.read<AuthBloc>().add(AuthEventCheckLogin(phone: _phoneController.text.trim()));
+    }
   }
 
 }

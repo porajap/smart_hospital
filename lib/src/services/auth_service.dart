@@ -55,6 +55,8 @@ class AuthService {
       throw AuthenticationException(message: '${Constants.textInternetLost}');
     } on TimeoutException {
       throw AuthenticationException(message: '${Constants.textInternetLost}');
+    } catch (err) {
+      throw AuthenticationException(message: '${Constants.textLoginFailed}');
     }
   }
 
