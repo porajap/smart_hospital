@@ -47,41 +47,49 @@ class _MapPageState extends State<MapPage> {
   Future<void> _getCurrentPosition() async {
     BotToast.showLoading();
 
-    final hasPermission = await _handlePermission();
+    try{
+      final hasPermission = await _handlePermission();
 
-    if (!hasPermission) {
-      return;
+      if (!hasPermission) {
+        return;
+      }
+
+      final position = await _geoLocator.getCurrentPosition(
+        locationSettings: LocationSettings(
+          accuracy: LocationAccuracy.bestForNavigation,
+        ),
+      );
+      logger.i(roomLocationModel.toJson());
+
+      var roomLatitude = double.parse('${roomLocationModel.data?.latitude}' ?? '0');
+      var roomLongitude =  double.parse('${roomLocationModel.data?.longitude}' ?? '0');
+
+      if(roomLatitude == 0 || roomLongitude == 0){
+        throw Exception("Latitude or Longitude is invalid");
+      }
+
+      destination = await _geoLocator.distanceBetween(
+        position.latitude,
+        position.longitude,
+        roomLatitude,
+        roomLongitude,
+      );
+
+      logger.w("Destination ${destination.round()} M"); //to m.
+
+      List<Placemark> startPlaceMarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+      Placemark startPlace = startPlaceMarks[0];
+      logger.w(startPlace);
+
+      List<Placemark> endPlaceMarks = await placemarkFromCoordinates(roomLatitude, roomLongitude);
+      Placemark endPlace = endPlaceMarks[0];
+      logger.w(endPlace);
+    }catch(err){
+      logger.e(err);
+    }finally{
+      BotToast.closeAllLoading();
     }
 
-    final position = await _geoLocator.getCurrentPosition(
-      locationSettings: LocationSettings(
-        accuracy: LocationAccuracy.bestForNavigation,
-      ),
-    );
-
-    logger.i(position);
-
-    var roomLatitude = roomLocationModel.data?.latitude ?? 0;
-    var roomLongitude = roomLocationModel.data?.longitude ?? 0;
-
-    destination = await _geoLocator.distanceBetween(
-      position.latitude,
-      position.longitude,
-      roomLatitude as double,
-      roomLongitude as double,
-    );
-
-    logger.w("Destination ${destination.round()} M"); //to m.
-
-    List<Placemark> startPlaceMarks = await placemarkFromCoordinates(position.latitude, position.longitude);
-    Placemark startPlace = startPlaceMarks[0];
-    logger.w(startPlace);
-
-    List<Placemark> endPlaceMarks = await placemarkFromCoordinates(roomLatitude, roomLongitude);
-    Placemark endPlace = endPlaceMarks[0];
-    logger.w(endPlace);
-
-    BotToast.closeAllLoading();
   }
 
   Future<bool> _handlePermission() async {

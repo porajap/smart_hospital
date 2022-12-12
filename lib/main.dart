@@ -21,11 +21,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  // await pushNotificationService.setupFlutterNotifications();
-  //
-  // FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-  //   pushNotificationService.showFlutterNotification(message);
-  // });
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
